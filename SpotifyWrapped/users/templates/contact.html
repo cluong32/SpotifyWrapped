@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Developers</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/contact.css' %}">
+        
+</head>
+<body>
+<div class="background-shapes" id="backgroundShapes"></div>
+
+
+    <div class="nav-bar">
+        <a href="/home/">Home</a>
+        <a href="/profile/">Profile</a>
+        <a href="/top-artists/">Top Artists</a>
+        <a href="/top-tracks/">Top Tracks</a>
+        <a href="/top-genres/">Top Genres</a>
+        
+            <div class="nav-theme-lang">
+
+                <button onclick="toggleLanguage()" id="language-toggle">English</button>
+                
+                <button class="theme-toggle" onclick="toggleTheme()">Change Theme</button>
+            </div>
+    </div>
+    
+                <div id="snowContainer" class="snow-container"></div>
+                <div id="ghostContainer" class="ghost-container"></div>
+
+    
+
+
+<div class="team-section">
+    <!-- Team Picture and Descriptions -->
+   <h3 id="contact-developers-heading">Contact the Developers</h3>
+     <p id="contact-description">Our project is a Django web application that provides a "Spotify Wrapped" experience, allowing users to view their top songs, artists, and more based on Spotify data.</p>
+    
+    <div class="polaroid-grid">
+        <div class="polaroid">
+            <img src="{% static 'images/carter.jpeg' %}" alt="Carter">
+            <p>Carter Luong<br>Full Stack Developer</p>
+        </div>
+        <div class="polaroid">
+            <img src="{% static 'images/monia.jpg' %}" alt="Monia">
+            <p>Monia Hussain<br>Front End Developer</p>
+        </div>
+        <div class="polaroid">
+            <img src="{% static 'images/nivedha.jpeg' %}" alt="Nivedha">
+            <p>Nivedha Sivakumar<br>Front End Developer</p>
+        </div>
+        <div class="polaroid">
+            <img src="{% static 'images/jaideep.JPG' %}" alt="Jaideep">
+            <p>Jaideep Lingineni<br>Full Stack Developer/Scrum Master</p>
+        </div>
+        <div class="polaroid">
+            <img src="{% static 'images/aaron.jpg' %}" alt="Aaron">
+            <p>Aaron Lee<br>Backend Developer/Product Owner</p>
+        </div>
+    </div>
+
+   <h3 id="contact-heading">Get in Touch</h3>
+    <p id="contact-feedback">If you'd like to reach out, please use the Google Form linked below:</p>
+    <p><a href="https://forms.gle/o4fobn2vTmDfR5KE6" target="_blank">Leave Feedback via Google Form</a></p>
+</div>
+    
+
+
+
+    <script>
+        
+        
+        
+        /**
+         * Generates a dynamic background with animated shapes and appends them to a container.
+         * Shapes are randomly sized and positioned within the viewport, with CSS variables
+         * applied for animation.
+         * 
+         * @function createBackgroundShapes
+         * @throws Will log an error to the console if the `backgroundShapes` element is not found.
+         */
+        let currentTheme = 'default';
+
+function toggleTheme() {
+    const body = document.body;
+    const themeToggleButton = document.querySelector('.theme-toggle');
+    const snowContainer = document.getElementById('snowContainer');
+    const ghostContainer = document.getElementById('ghostContainer');
+
+    body.classList.remove('dark-mode', 'halloween-mode', 'christmas-mode');
+
+    if (currentTheme === 'default') {
+        body.classList.add('dark-mode');
+        currentTheme = 'dark';
+        themeToggleButton.textContent = 'Dark Mode';
+    } else if (currentTheme === 'dark') {
+        body.classList.add('halloween-mode');
+        currentTheme = 'halloween';
+        themeToggleButton.textContent = 'Halloween Mode';
+        generateGhosts();
+    } else if (currentTheme === 'halloween') {
+        body.classList.add('christmas-mode');
+        currentTheme = 'christmas';
+        themeToggleButton.textContent = 'Christmas Mode';
+        generateSnow();
+        ghostContainer.innerHTML = '';
+    } else {
+        currentTheme = 'default';
+        themeToggleButton.textContent = 'Change Theme';
+        snowContainer.innerHTML = '';
+        ghostContainer.innerHTML = '';
+    }
+}
+
+function generateSnow() {
+    const snowContainer = document.getElementById('snowContainer');
+    snowContainer.innerHTML = '';
+    for (let i = 0; i < 100; i++) {
+        const snowflake = document.createElement('div');
+        snowflake.classList.add('snow-dot');
+        snowflake.style.left = Math.random() * 100 + 'vw';
+        snowflake.style.animationDelay = Math.random() * 10 + 's';
+        snowflake.style.animationDuration = 5 + Math.random() * 5 + 's';
+        snowContainer.appendChild(snowflake);
+    }
+}
+
+function generateGhosts() {
+    const ghostContainer = document.getElementById('ghostContainer');
+    ghostContainer.innerHTML = '';
+    for (let i = 0; i < 30; i++) {
+        const ghost = document.createElement('div');
+        ghost.classList.add('ghost');
+        ghost.style.left = Math.random() * 100 + 'vw';
+        ghost.style.animationDelay = Math.random() * 5 + 's';
+        ghost.style.animationDuration = 4 + Math.random() * 4 + 's';
+        ghostContainer.appendChild(ghost);
+    }
+}
+
+function createBackgroundShapes() {
+    const shapes = document.getElementById('backgroundShapes');
+    for (let i = 0; i < 15; i++) {
+        const shape = document.createElement('div');
+        shape.className = 'shape';
+        shape.style.width = `${Math.random() * 200 + 50}px`;
+        shape.style.height = `${Math.random() * 200 + 50}px`;
+        shape.style.left = `${Math.random() * 100}%`;
+        shape.style.top = `${Math.random() * 100}%`;
+        shape.style.setProperty('--moveX', `${Math.random() * window.innerWidth}px`);
+        shape.style.setProperty('--moveY', `${Math.random() * window.innerHeight}px`);
+        shape.style.animationDelay = `${Math.random() * 20}s`;
+        shapes.appendChild(shape);
+    }
+}
+
+createBackgroundShapes();
+
+        
+        
+const translations = {
+    en: {
+        navbar: {
+            home: "Home",
+            profile: "Profile",
+            topArtists: "Top Artists",
+            topTracks: "Top Tracks",
+            topGenres: "Top Genres",
+        },
+        contact: {
+            heading: "Get in Touch",
+            description: 'Our project is a Django web application that provides a "Spotify Wrapped" experience, allowing users to view their top songs, artists, and more based on Spotify data.',
+            feedback: "If you'd like to reach out, please use the Google Form linked below:",
+        },
+        contactDevelopers: "Contact the Developers",
+        team: {
+            carter: "Carter Luong<br>Full Stack Developer",
+            monia: "Monia Hossain<br>Front End Developer",
+            nivedha: "Nivedha Sivakumar<br>Front End Developer",
+            jaideep: "Jaideep Lingineni<br>Full Stack Developer/Scrum Master",
+            aaron: "Aaron Lee<br>Backend Developer/Product Owner",
+        },
+    },
+    es: {
+        navbar: {
+            home: "Inicio",
+            profile: "Perfil",
+            topArtists: "Artistas Principales",
+            topTracks: "Canciones Principales",
+            topGenres: "Géneros Principales",
+        },
+        contact: {
+            heading: "Contacta con los Desarrolladores",
+            description: 'Nuestro proyecto es una aplicación web Django que proporciona una experiencia "Spotify Wrapped", permitiendo a los usuarios ver sus canciones, artistas y más basados en datos de Spotify.',
+            feedback: "Si deseas ponerte en contacto, utiliza el formulario de Google enlazado a continuación:",
+        },
+        contactDevelopers: "Contacta con los Desarrolladores",
+        team: {
+            carter: "Carter Luong<br>Desarrollador Full Stack",
+            monia: "Monia Hossain<br>Desarrolladora Front End",
+            nivedha: "Nivedha Sivakumar<br>Desarrolladora Front End",
+            jaideep: "Jaideep Lingineni<br>Desarrollador Full Stack/Scrum Master",
+            aaron: "Aaron Lee<br>Desarrollador Backend/Propietario del Producto",
+        },
+    },
+    bn: {
+        navbar: {
+            home: "হোম",
+            profile: "প্রোফাইল",
+            topArtists: "শীর্ষ শিল্পী",
+            topTracks: "শীর্ষ গান",
+            topGenres: "শীর্ষ ধরন",
+        },
+        contact: {
+            heading: "যোগাযোগ করুন",
+            description: 'আমাদের প্রকল্পটি একটি Django ওয়েব অ্যাপ্লিকেশন যা "Spotify Wrapped" অভিজ্ঞতা প্রদান করে, যা ব্যবহারকারীদের তাদের শীর্ষ গান, শিল্পী এবং আরও অনেক কিছু Spotify ডেটার উপর ভিত্তি করে দেখতে দেয়।',
+            feedback: "যদি আপনি আমাদের সাথে যোগাযোগ করতে চান, তাহলে নিচের Google ফর্মটি ব্যবহার করুন:",
+        },
+        contactDevelopers: "ডেভেলপারদের সাথে যোগাযোগ করুন",
+        team: {
+            carter: "কার্টার লুং<br>ফুল স্ট্যাক ডেভেলপার",
+            monia: "মনিয়া হোসেন<br>ফ্রন্ট এন্ড ডেভেলপার",
+            nivedha: "নিবেদা শিবাকুমার<br>ফ্রন্ট এন্ড ডেভেলপার",
+            jaideep: "জাইদিপ লিঙ্গিনেনি<br>ফুল স্ট্যাক ডেভেলপার/স্ক্রাম মাস্টার",
+            aaron: "অ্যারন লি<br>ব্যাকএন্ড ডেভেলপার/পণ্য মালিক",
+        },
+    },
+    zh: {
+        navbar: {
+            home: "主页",
+            profile: "个人资料",
+            topArtists: "最喜欢的艺术家",
+            topTracks: "最喜欢的歌曲",
+            topGenres: "最喜欢的音乐类型",
+        },
+        contact: {
+            heading: "联系我们",
+            description: '我们的项目是一个基于 Django 的网络应用程序，提供了 "Spotify Wrapped" 体验，允许用户根据 Spotify 数据查看他们最喜欢的歌曲、艺术家等。',
+            feedback: "如果您想与我们联系，请使用以下链接的 Google 表单：",
+        },
+        contactDevelopers: "联系我们的开发人员",
+        team: {
+            carter: "卡特·隆<br>全栈开发人员",
+            monia: "莫尼亚·霍森<br>前端开发人员",
+            nivedha: "尼维达·西瓦库马尔<br>前端开发人员",
+            jaideep: "贾伊迪普·林吉内尼<br>全栈开发人员/敏捷教练",
+            aaron: "亚伦·李<br>后端开发人员/产品负责人",
+        },
+    },
+};
+
+let currentLanguage = "en"; // Default language
+
+function toggleLanguage() {
+    // Cycle through languages
+    const languages = ["en", "es", "bn", "zh"];
+    const nextLangIndex = (languages.indexOf(currentLanguage) + 1) % languages.length;
+    currentLanguage = languages[nextLangIndex];
+
+    // Fetch translations for the current language
+    const translation = translations[currentLanguage];
+
+    // Update Navbar
+    const navLinks = document.querySelectorAll(".nav-bar a");
+    if (navLinks.length >= 5) {
+        navLinks[0].textContent = translation.navbar.home;
+        navLinks[1].textContent = translation.navbar.profile;
+        navLinks[2].textContent = translation.navbar.topArtists;
+        navLinks[3].textContent = translation.navbar.topTracks;
+        navLinks[4].textContent = translation.navbar.topGenres;
+    }
+
+    // Update "Contact the Developers" Section
+    const contactDevelopersHeading = document.querySelector("#contact-developers-heading");
+    const contactDescription = document.querySelector("#contact-description");
+    if (contactDevelopersHeading) contactDevelopersHeading.textContent = translation.contactDevelopers;
+    if (contactDescription) contactDescription.textContent = translation.contact.description;
+
+    // Update Team Section
+    const teamCarter = document.querySelector("#team-carter");
+    const teamMonia = document.querySelector("#team-monia");
+    const teamNivedha = document.querySelector("#team-nivedha");
+    const teamJaideep = document.querySelector("#team-jaideep");
+    const teamAaron = document.querySelector("#team-aaron");
+    if (teamCarter) teamCarter.innerHTML = translation.team.carter;
+    if (teamMonia) teamMonia.innerHTML = translation.team.monia;
+    if (teamNivedha) teamNivedha.innerHTML = translation.team.nivedha;
+    if (teamJaideep) teamJaideep.innerHTML = translation.team.jaideep;
+    if (teamAaron) teamAaron.innerHTML = translation.team.aaron;
+
+    // Update Contact Section
+    const contactHeading = document.querySelector("#contact-heading");
+    const contactFeedback = document.querySelector("#contact-feedback");
+    if (contactHeading) contactHeading.textContent = translation.contact.heading;
+    {#if (contactFeedback) {#}
+    {#    contactFeedback.innerHTML = `#}
+    {#        ${translation.contact.feedback}#}
+    {#        <a href="https://forms.gle/o4fobn2vTmDfR5KE6" target="_blank">Leave Feedback via Google Form</a>`;#}
+    
+
+        // Update Language Toggle Button Text
+        const langButton = document.querySelector("#language-toggle");
+        if (langButton) {
+            langButton.textContent = {
+                en: "English",
+                es: "Español",
+                bn: "বাংলা",
+                zh: "中文",
+            }[currentLanguage];
+        }
+    }
+    </script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Welcome to Spotify</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+</head>
+<body>
+    <div class="background-shapes" id="backgroundShapes"></div>
+    <div class="snow-container" id="snowContainer"></div>
+    <div id="green-bubble-container"></div>
+    <div class="container">
+        <h1 id="welcomeText">Welcome, {{ user_name }}!</h1>
+        <img src="https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_White.png" alt="Spotify Logo" class="spotify-logo">
+    </div>
+    <button class="theme-toggle" id="themeToggle">Change Theme</button>
+    <button class="lang-toggle" id="langToggle">Español</button>
+
+    <div class="button-container">
+    <a href="/top-tracks/" class="button tracks">Top Tracks</a>
+    <a href="/top-artists/" class="button artists">Top Artists</a>
+    <a href="/top-genres/" class="button genres">Top Genres</a>
+    <a href="/spotify_wrapped/" class="button profile">Spotify Wrapped</a>
+</div>
+
+     <!-- Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle">☰ Menu</button>
+
+    <!-- Slide-in Navigation Menu -->
+    <div class="nav-menu" id="navMenu">
+        <button class="close-menu" id="closeMenu">&times;</button>
+        <a href="/profile/">Profile</a>
+        <a href="/contact_us/">Contacts</a>
+        <a href="{% url 'users:public_wraps' %}">Public Wraps</a>
+    </div>
+
+
+    <script>
+
+         // Menu toggle script
+        const menuToggle = document.getElementById('menuToggle');
+        const navMenu = document.getElementById('navMenu');
+        const closeMenu = document.getElementById('closeMenu');
+
+        menuToggle.addEventListener('click', () => {
+            navMenu.classList.add('active'); // Show the menu
+        });
+
+        closeMenu.addEventListener('click', () => {
+            navMenu.classList.remove('active'); // Hide the menu
+        });
+
+        const themeToggleButton = document.getElementById('themeToggle');
+        const langToggleButton = document.getElementById('langToggle');
+        const body = document.body;
+
+        let currentTheme = 'light';
+        let currentLang = 'en';
+        let cornerImage; // Halloween corner image
+        let halloweenTopLeftImage; // Halloween top-left corner image
+        let halloweenBackgroundOverlay; // Halloween background overlay
+        let snowImage; // Snow image
+        let christmasCornerImage; // Christmas corner image
+
+         themeToggleButton.addEventListener('click', () => {
+            // Remove all theme classes
+            body.classList.remove('dark-mode', 'halloween-mode', 'christmas-mode');
+
+            // Clear decorations for all themes
+            clearSnowflakes();
+            removeGreenBubbles();
+
+            if (currentTheme === 'light') {
+                body.classList.add('dark-mode');
+                themeToggleButton.textContent = 'Halloween Mode';
+                currentTheme = 'dark';
+            } else if (currentTheme === 'dark') {
+                body.classList.add('halloween-mode');
+                themeToggleButton.textContent = 'Christmas Mode';
+                currentTheme = 'halloween';
+
+                if (!cornerImage) {
+                    cornerImage = document.createElement('img');
+                    cornerImage.src = 'https://gifdb.com/images/file/flying-bats-cartoon-acdllo1q8cbqdsck.gif';
+                    cornerImage.alt = 'Halloween Image';
+                    cornerImage.className = 'corner-image';
+                    document.body.appendChild(cornerImage);
+                }
+
+                if (!halloweenTopLeftImage) {
+                    halloweenTopLeftImage = document.createElement('img');
+                    halloweenTopLeftImage.src = 'https://i.pinimg.com/originals/cf/94/ea/cf94eaa6adf8183c2e7250d56efd9f9a.gif';
+                    halloweenTopLeftImage.alt = 'Halloween Top-Left Image';
+                    halloweenTopLeftImage.className = 'halloween-top-left-image';
+                    document.body.appendChild(halloweenTopLeftImage);
+                }
+
+                if (!halloweenBackgroundOverlay) {
+                    halloweenBackgroundOverlay = document.createElement('img');
+                    halloweenBackgroundOverlay.src = 'https://www.fg-a.com/witches/witch-flying-animated.gif';
+                    halloweenBackgroundOverlay.alt = 'Halloween Background Overlay';
+                    halloweenBackgroundOverlay.className = 'halloween-background-overlay move-horizontal';
+                    document.body.appendChild(halloweenBackgroundOverlay);
+                }
+
+                createGreenBubbles(); // Generate green bubbles for Halloween theme
+
+                // Remove Christmas decorations
+                if (christmasCornerImage) {
+                    document.body.removeChild(christmasCornerImage);
+                    christmasCornerImage = null;
+                }
+            } else if (currentTheme === 'halloween') {
+                body.classList.add('christmas-mode');
+                themeToggleButton.textContent = 'Light Mode';
+                currentTheme = 'christmas';
+
+                // Remove Halloween decorations
+                if (cornerImage) {
+                    document.body.removeChild(cornerImage);
+                    cornerImage = null;
+                }
+                if (halloweenTopLeftImage) {
+                    document.body.removeChild(halloweenTopLeftImage);
+                    halloweenTopLeftImage = null;
+                }
+                if (halloweenBackgroundOverlay) {
+                    document.body.removeChild(halloweenBackgroundOverlay);
+                    halloweenBackgroundOverlay = null;
+                }
+
+                removeGreenBubbles(); // Clear green bubbles
+
+               
+                if (!christmasCornerImage) {
+                    christmasCornerImage = document.createElement('img');
+                    christmasCornerImage.src = 'https://th.bing.com/th/id/R.7f1f76ac29bc01ad318abbf0468b1062?rik=9pgyAcaPUtY0eA&pid=ImgRaw&r=0';
+                    christmasCornerImage.alt = 'Christmas Corner Image';
+                    christmasCornerImage.className = 'christmas-corner-image move-horizontal';
+                    document.body.appendChild(christmasCornerImage);
+                }
+
+                generateSnowflakes(); // Generate snowflakes for Christmas
+            } else {
+                currentTheme = 'light';
+                themeToggleButton.textContent = 'Change Theme';
+
+                // Remove all decorations
+                if (cornerImage) document.body.removeChild(cornerImage);
+                if (halloweenTopLeftImage) document.body.removeChild(halloweenTopLeftImage);
+                if (halloweenBackgroundOverlay) document.body.removeChild(halloweenBackgroundOverlay);
+                if (snowImage) document.body.removeChild(snowImage);
+                if (christmasCornerImage) document.body.removeChild(christmasCornerImage);
+
+                cornerImage = halloweenTopLeftImage = halloweenBackgroundOverlay = snowImage = christmasCornerImage = null;
+            }
+        });
+
+        // Function to generate green bubbles
+        function createGreenBubbles() {
+            const bubbleContainer = document.getElementById('green-bubble-container');
+            const numBubbles = 70; // Number of bubbles
+
+            // Clear existing bubbles
+            removeGreenBubbles();
+
+            for (let i = 0; i < numBubbles; i++) {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+
+                const size = Math.random() * 50 + 20; // Size between 20px and 70px
+                const startX = Math.random() * window.innerWidth;
+                const delay = Math.random() * 4; // Delay up to 4 seconds
+                const duration = Math.random() * 3 + 5; // Duration between 5-8 seconds
+
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${startX}px`;
+                bubble.style.animationDuration = `${duration}s`;
+                bubble.style.animationDelay = `${delay}s`;
+
+                bubbleContainer.appendChild(bubble);
+            }
+        }
+
+        // Function to clear existing green bubbles
+        function removeGreenBubbles() {
+            const bubbleContainer = document.getElementById('green-bubble-container');
+            if (bubbleContainer) {
+                bubbleContainer.innerHTML = ''; // Clear all bubbles
+            }
+        }
+
+        // Function to generate snowflakes
+        function generateSnowflakes() {
+            const numberOfSnowflakes = 200;
+            const snowContainer = document.createElement('div');
+            snowContainer.className = 'snow-container';
+            document.body.appendChild(snowContainer);
+
+            for (let i = 0; i < numberOfSnowflakes; i++) {
+                const snowflake = document.createElement('div');
+                snowflake.classList.add('snowflake');
+                snowflake.style.left = Math.random() * 100 + 'vw';
+                snowflake.style.animationDelay = Math.random() * 10 + 's';
+                snowflake.style.animationDuration = 5 + Math.random() * 5 + 's';
+                snowContainer.appendChild(snowflake);
+            }
+        }
+
+        // Function to clear existing snowflakes
+        function clearSnowflakes() {
+            const snowContainer = document.querySelector('.snow-container');
+            if (snowContainer) snowContainer.remove();
+        }
+        langToggleButton.addEventListener('click', () => {
+    const translations = {
+        en: {
+            welcomeText: 'Welcome, {{ user_name }}!',
+            langToggle: 'Español',
+            themeToggle: 'Change Theme',
+            menuToggle: '☰ Menu',
+            buttonTexts: ['Top Tracks', 'Top Artists', 'Top Genres', 'Spotify Wrapped'],
+            navItems: ['Profile', 'Contacts', 'Public Wraps']
+        },
+        es: {
+            welcomeText: '¡Bienvenido, {{ user_name }}!',
+            langToggle: '中文',
+            themeToggle: 'Cambiar Tema',
+            menuToggle: '☰ Menú',
+            buttonTexts: ['Mejores Canciones', 'Mejores Artistas', 'Mejores Géneros', 'Spotify Envuelto'],
+            navItems: ['Perfil', 'Contactos', 'Envoltorios Públicos']
+        },
+        zh: {
+            welcomeText: '欢迎，{{ user_name }}!',
+            langToggle: 'বাংলা',
+            themeToggle: '更改主题',
+            menuToggle: '☰ 菜单',
+            buttonTexts: ['最佳曲目', '最佳艺术家', '最佳流派', 'Spotify 总结'],
+            navItems: ['个人资料', '联系人', '公共包装']
+        },
+        bn: {
+            welcomeText: 'স্বাগতম, {{ user_name }}!',
+            langToggle: 'English',
+            themeToggle: 'থিম পরিবর্তন করুন',
+            menuToggle: '☰ মেনু',
+            buttonTexts: ['শ্রেষ্ঠ গান', 'শ্রেষ্ঠ শিল্পী', 'শ্রেষ্ঠ ধারা', 'Spotify মোড়ানো'],
+            navItems: ['প্রোফাইল', 'যোগাযোগ', 'পাবলিক র‍্যাপ']
+        }
+    };
+
+    currentLang = currentLang === 'en' ? 'es' : currentLang === 'es' ? 'zh' : currentLang === 'zh' ? 'bn' : 'en';
+    const selectedLang = translations[currentLang];
+
+    // Update translatable elements
+    document.getElementById('welcomeText').textContent = selectedLang.welcomeText;
+    langToggleButton.textContent = selectedLang.langToggle;
+    themeToggleButton.textContent = selectedLang.themeToggle;
+    menuToggle.textContent = selectedLang.menuToggle;
+
+    // Update navigation menu items
+    const navLinks = navMenu.querySelectorAll('a');
+    navLinks.forEach((link, index) => {
+        link.textContent = selectedLang.navItems[index];
+    });
+
+    // Update button texts in the button container
+    const buttons = document.querySelectorAll('.button-container .button');
+    buttons.forEach((button, index) => {
+        button.textContent = selectedLang.buttonTexts[index];
+    });
+});
+
+        /**
+         * Generates a dynamic background with animated shapes and appends them to a container.
+         * Shapes are randomly sized and positioned within the viewport, with CSS variables
+         * applied for animation.
+         * 
+         * @function createBackgroundShapes
+         * @throws Will log an error to the console if the `backgroundShapes` element is not found.
+         */
+        function createBackgroundShapes() {
+            const shapes = document.getElementById('backgroundShapes');
+            const numShapes = 15;
+
+            for (let i = 0; i < numShapes; i++) {
+                const shape = document.createElement('div');
+                shape.className = 'shape';
+
+                // Random properties
+                const size = Math.random() * 200 + 50;
+                const moveX = Math.random() * window.innerWidth;
+                const moveY = Math.random() * window.innerHeight;
+
+                shape.style.width = `${size}px`;
+                shape.style.height = `${size}px`;
+                shape.style.left = `${Math.random() * 100}%`;
+                shape.style.top = `${Math.random() * 100}%`;
+                shape.style.setProperty('--moveX', `${moveX}px`);
+                shape.style.setProperty('--moveY', `${moveY}px`);
+                shape.style.animationDelay = `${Math.random() * 20}s`;
+
+                shapes.appendChild(shape);
+            }
+        }
+
+        // Initialize background shapes
+        createBackgroundShapes();
+
+
+
+    </script>
+</body>
+</html>

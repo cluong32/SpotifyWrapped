@@ -1,0 +1,639 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%; /* Ensure html and body span the full height */
+    min-height: 100vh; /* Minimum height for full viewport coverage */
+     /* Prevent unwanted scroll caused by extra containers */
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-family: Arial, sans-serif;
+}
+
+        .nav-bar {
+            background-color: var(--nav-bg);
+    border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .nav-bar a {
+            color: white;
+            text-decoration: none;
+            margin-right: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+        .lang-toggle {
+    position: absolute;
+    top: 10px;
+    left: 75%;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid white;
+    padding: 8px 16px;
+    font-size: 0.9em;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    z-index: 1001;
+}
+
+.lang-toggle:hover {
+    background-color: white;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+        .nav-bar a:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+.theme-toggle {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    margin-left: 10px;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid white;
+    padding: 8px 16px;
+    font-size: 0.9em;
+    cursor: pointer;
+    border-radius: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.theme-toggle:hover {
+    background-color: white;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+/* Dark Mode */
+:root {
+    /* Light theme (default) */
+    --bg-color: linear-gradient(45deg, #450af5, #c4efd9);
+    --text-color: #f5f5f5;
+    --card-bg: #f5f5f5;
+    --button-bg: #a28ce3;
+    --button-hbg: #c8b6f4;
+    --pause-bg: #68549a;
+    --button-text: #ffffff;
+    --tab-bg:#c4efd9;
+    --nav-bg: rgba(0, 0, 0, 0.2);
+    /*--border-color: #dee2e6;*/
+     font-family: Arial, sans-serif;
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+    --bg-color: linear-gradient(135deg, #03280a, #0c0c0c);
+    --text-color: #ffffff;
+    --card-bg: #282828;
+    --button-bg: #1DB954;
+    --button-hbg: #116e34;
+    --pause-bg: #1DB954;
+    --tab-bg: #1DB954;
+    --button-text: #ffffff;
+    --nav-bg: #181818;
+
+}
+
+/* Halloween theme */
+[data-theme="halloween"] {
+    --bg-color: radial-gradient(circle, #f0701b, #000000);
+    --text-color: #000000;
+    --card-bg: #FFB86C;
+    --button-bg: #f0701b;
+    --button-hbg: #ac5014;
+    --pause-bg: #f0701b;
+    --tab-bg: #12ff23;
+    --button-text: #ffffff;
+    --nav-bg: #2C1810;
+
+}
+
+/* Christmas theme */
+[data-theme="christmas"] {
+    --bg-color: linear-gradient(135deg, #ff0000, #490102);
+    --text-color: #ffffff;
+    --card-bg: rgba(255, 255, 255, 0.9);
+    --button-bg: #D42426;
+    --button-hbg: #490102;
+    --pause-bg: #D42426;
+    --tab-bg: #ffffff;
+    --button-text: #ffffff;
+    --nav-bg: rgba(0, 0, 0, 0.2);
+
+}
+
+        .wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+        }
+
+        .story-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            width: 50px;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            border-radius: 2px;
+            transition: background-color 0.3s;
+        }
+
+        .tab.active {
+             background-color: var(--tab-bg);
+        }
+
+        .stories {
+            position: relative;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .story-slide {
+            display: none;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .story-slide.active {
+            display: block;
+        }
+
+        .section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .artist-image, .track-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            margin: 10px auto;
+            display: block;
+            object-fit: cover;
+        }
+
+        .tracks-list li, .artists-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 15px;
+            cursor: pointer;
+            border-radius: 50%;
+            z-index: 2;
+            transition: background-color 0.3s;
+        }
+
+        .arrow:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+
+        .left-arrow {
+            left: 10px;
+        }
+
+        .right-arrow {
+            right: 10px;
+        }
+
+        .save-wrap-button {
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        .save-wrap-button:hover {
+            background-color: var(--button-hbg);
+        }
+
+        .save-success {
+            background-color: #a28ce3;
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        .guess-button{
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            width: 25%;
+        }
+
+        .guess-button:hover {
+            background-color: var(--button-hbg) !important;
+        }
+
+        #playTopTrack{
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            width: 50%;
+        }
+
+        #playTopTrack:hover{
+            background-color: var(--button-hbg);
+        }
+        #pauseTrack{
+            background-color: var(--button-bg);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+            width: 50%;
+        }
+
+        #pauseTrack:hover{
+             background-color: var(--button-hbg);
+        }
+
+        #playPauseButton {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+             background-color: var(--pause-bg);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .playlist-link {
+            display: inline-block;
+            background-color: #a28ce3;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .playlist-link:hover {
+            background-color: #C4EFD9FF;
+        }
+
+        #summary-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+
+        .top-artist-image {
+            margin-bottom: 20px;
+        }
+
+        .top-section {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .top-section > div {
+            width: 45%;
+        }
+
+        h2 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            text-transform: capitalize;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 5px 0;
+            font-size: 1.2em;
+        }
+
+        .top-genre {
+            margin-top: 20px;
+            text-transform: capitalize;
+        }
+
+        #snow-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;  /* Prevent interaction with snowflakes */
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.snow-dot {
+    position: absolute;
+    background-color: white;
+    border-radius: 50%;  /* Make it round */
+    width: 8px;  /* Dot size */
+    height: 8px;
+    animation: fall 10s linear infinite;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-10px) rotate(0deg);
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+    }
+}
+
+#green-bubble-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.bubble {
+    position: absolute;
+    background-color: rgba(10, 184, 18, 0.57); /* Transparent green */
+    border-radius: 50%;
+    animation: floatUp 6s linear infinite;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(100vh) scale(0.5);
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-10vh) scale(1.2);
+        opacity: 0;
+    }
+}
+
+.matching-artists {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px auto;
+}
+
+.artist-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.artist-card img {
+    width: 100%;
+    height: auto;
+    max-height: 100%;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.artist-card p {
+    margin-top: 10px;
+    font-size: 1em;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+}
+
+.top-tracks-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    max-width: 300px;
+}
+
+.track-image-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.track-image-playlist {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.logo {
+    width: 300px;
+    height: auto;
+}
+
+.guess-artist-genre {
+    text-transform: capitalize;
+}
+
+.guess-button {
+    background-color: var(--button-bg) !important;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 20px;
+    width: 25%;
+}
+
+.guess-button:hover {
+    background-color: var(--button-hbg) !important;
+}
+
+
+@media screen and (max-width: 768px) {
+    /* Navigation adjustments */
+    .nav-bar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    /* Theme and Language toggle buttons */
+    .theme-toggle, .lang-toggle {
+        position: static;
+        width: 80%;
+        margin: 5px auto;
+    }
+    
+    /* Story tabs spacing */
+    .story-tabs {
+        gap: 5px;
+    }
+    
+    /* Track box adjustments */
+    .track-box {
+        width: 100%;
+        max-width: 300px;
+    }
+    
+    /* Summary container */
+    #summary-container {
+        padding: 10px;
+    }
+    
+    /* Top section layout */
+    .top-section {
+        flex-direction: column;
+    }
+    
+    .top-section > div {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    /* Further adjustments for very small screens */
+    .wrapper {
+        padding: 10px;
+    }
+    
+    /* Grid adjustments */
+    .top-tracks-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    /* Artist cards */
+    .matching-artists {
+        flex-direction: column;
+    }
+    
+    .artist-card {
+        width: 100%;
+        max-width: 200px;
+        margin: 10px auto;
+    }
+    
+    /* Buttons */
+    .guess-button {
+        width: 80%;
+    }
+    
+    #playTopTrack, #pauseTrack {
+        width: 80%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+    
+    h1 {
+        font-size: 1.8em;
+    }
+    
+    h2 {
+        font-size: 1.3em;
+    }
+    
+    .track-name {
+        font-size: 0.9em;
+    }
+    
+    .artist-name {
+        font-size: 0.8em;
+    }
+}
+
+@media (hover: none) {
+    /* Increase touch targets */
+    .arrow {
+        padding: 20px;
+    }
+    
+    .tab {
+        min-height: 30px;
+        min-width: 30px;
+    }
+    
+    /* Increase button spacing */
+    .guess-button,
+    #playTopTrack,
+    #pauseTrack,
+    .save-wrap-button {
+        margin: 15px auto;
+        min-height: 44px; /* Standard minimum touch target size */
+    }
+}

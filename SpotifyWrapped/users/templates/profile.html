@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+    <meta charset="UTF-8">
+    <title>Your Profile</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+<body>
+    {% load static %}
+    <div class="nav-bar">
+        <a href="{% url 'users:home' %}">Home</a>
+        <a href="{% url 'users:profile' %}">Profile</a>
+        <a href="{% url 'users:spotify_wrapped' %}">My Wrapped</a>
+        <a href="{% url 'users:public_wraps' %}">Public Wraps</a>
+        <div class="nav-auth">
+            <button id="lang-toggle-btn" onclick="toggleLanguage()">English</button>
+            <button id="theme-toggle-btn" class="toggle-button">Change Theme</button>
+            <div class="snow-container" id="snowContainer"></div>
+            <div class="ghost-container" id="ghostContainer"></div>
+            <a href="{% url 'users:delete_user' %}" class="delete-button" id="delete-account-button">Delete Account</a>
+            <a href="{% url 'users:signout' %}" class="logout-button">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="header-container">
+            <h1>Your Profile</h1>
+        </div>
+
+        <div class="wraps-container">
+            {% if user_wraps %}
+                {% for wrap in user_wraps %}
+                    <div class="wrap-card" onclick="showWrapDetails('{{ wrap.id }}')">
+                        <div class="wrap-date">
+                            Created on {{ wrap.created_at|date:"F j, Y" }}
+                        </div>
+                        <div class="wrap-content">
+                            <h3>Top Artist</h3>
+                            <p>{{ wrap.top_artist }}</p>
+
+                            <h3>Top Track</h3>
+                            <p>{{ wrap.top_track }}</p>
+
+                            <h3>Top Genre</h3>
+                            <div class="content-genre">
+                                <p>{{ wrap.top_genre }}</p>
+                            </div>
+                        </div>
+
+                        <div class="button-group">
+                            <form action="{% url 'users:toggle_wrap_visibility' wrap.id %}" method="post" class="inline-form">
+                                {% csrf_token %}
+                                <button type="submit" class="visibility-toggle" onclick="event.stopPropagation()">
+                                    {% if wrap.public %}
+                                        Make Private
+                                    {% else %}
+                                        Make Public
+                                    {% endif %}
+                                </button>
+                            </form>
+
+                            <form action="{% url 'users:delete_wrap' wrap.id %}" method="post" class="inline-form"
+                                  onsubmit="return confirm('Are you sure you want to delete this wrap? This action cannot be undone.');">
+                                {% csrf_token %}
+                                <button type="submit" class="delete-button" onclick="event.stopPropagation()">
+                                    Delete Wrap
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Modal for this wrap -->
+                    <!-- Replace the existing modal section in your profile template with this -->
+<!-- Modal for this wrap -->
+<div id="modal-{{ wrap.id }}" class="modal">
+    <div class="modal-content">
+        <button class="close-button" onclick="closeModal('{{ wrap.id }}')">&times;</button>
+
+        <div class="story-tabs">
+            <div class="tab active" onclick="goToModalSlide('{{ wrap.id }}', 0)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 1)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 2)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 3)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 4)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 5)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 6)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 7)"></div>
+        </div>
+
+        <div class="stories">
+            <div class="arrow left-arrow" onclick="prevModalSlide('{{ wrap.id }}')">&lt;</div>
+                <!-- Slide 1: Welcome to Spotify Wrapped -->
+                <div class="story-slide acitve">
+                    <div class="section">
+                        <img src="{% static 'images/Spotify_logo.png' %}" alt="Spotify logo" class="logo">
+                        <h1>Welcome to Your Spotify Wrapped!</h1>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Guess Top Artist -->
+                <div class="story-slide">
+
+                    <h1>Guess the Artist</h1>
+                    <div class="section">
+                        {% if wrap.top_artist %}
+                            <!-- Display the genres of the top artist -->
+                            <p><strong>Your top artist's genre:</strong>
+                                <div class="guess-artist-genre">
+                                    {{ wrap.top_genre }}
+                                </div>
+                            </p>
+
+                            <!-- Buttons for guessing the artist -->
+                            <p>Guess who your top artist is!</p>
+                            <ul>
+                                {% for choice in wrap.top_3_artists %}
+                                    <li>
+                                        <button class="guess-button" onclick="checkAnswerArtist('{{ choice.name }}', '{{ wrap.top_artist }}')">
+                                            {{ choice.name }}
+                                        </button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <p id="resultArtist"></p>
+                        {% else %}
+                            <p>Unable to fetch artist information. Please try again later.</p>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <!-- Slide 3: Top Artist -->
+                <div class="story-slide">
+                    <h1>
+                        {% if language == 'es' %}Tu Artista Principal
+                        {% elif language == 'bn' %}তোমার শীর্ষ শিল্পী
+                        {% elif language == 'zh' %}你最喜欢的艺术家
+                        {% else %}Your Top Artist{% endif %}
+                    </h1>
+                    {% if wrap.top_artist %}
+                        <div class="section">
+                            <img class="artist-image" src="{{ wrap.top_artist_image_url }}" alt="{{ wrap.top_artist }}">
+                            <h2>{{ wrap.top_artist }}</h2>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Slide 4: Guess Top Track -->
+                <div class="story-slide">
+                    <h1>Guess the Song</h1>
+                        <div class="section">
+                        {% if wrap.top_track %}
+                            <button class="guess-button" onclick="playSnippet()"> Play</button>
+                            <p>Guess one of your top tracks from this snippet!</p>
+                            <ul>
+                                {% for choice in wrap.top_3_tracks %}
+                                    <li>
+                                        <button class="guess-button" onclick="checkAnswer('{{ choice.name }}', '{{ wrap.guess_song_game.name }}')">
+                                            {{ choice.name }}
+                                        </button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <p id="result"></p>
+                        {% else %}
+                            <p>Unable to fetch a song snippet. Please try again later.</p>
+                        {% endif %}
+                        </div>
+                </div>
+
+                <!-- Slide 5: Top Track -->
+                <div class="story-slide">
+                    <h1>
+                        {% if language == 'es' %}Tu Canción Principal
+                        {% elif language == 'bn' %}তোমার শীর্ষ গান
+                        {% elif language == 'zh' %}你最喜欢的歌曲
+                        {% else %}Your Top Track{% endif %}
+                    </h1>
+                    {% if wrap.top_track %}
+                        <div class="section">
+                            <img class="track-image" src="{{ wrap.top_track_image_url }}" alt="{{ wrap.top_track }}">
+                             <h2>{{ wrap.top_track }}</h2>
+                            <!-- Play Button -->
+                            <button id='playTopTrack' onclick="playTopTrack()">Play Top Track</button>
+                            <button id='pauseTrack' onclick="pauseTrack()">Pause </button>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Slide 6: Top Genre -->
+                <div class="story-slide">
+                    <h1>{% if language == 'es' %}Tu Género Principal
+                        {% elif language == 'bn' %}তোমার শীর্ষ ধরন
+                        {% elif language == 'zh' %}你最喜欢的音乐类型
+                        {% else %}Your Top Genre{% endif %}</h1>
+                    {% if wrap.top_genre %}
+                        <div class="section">
+                            <div class="matching-artists">
+                                {% for artist in wrap.matching_artists %}
+                                    <div class="artist-card">
+                                        {% if artist.image_url %}
+                                            <img src="{{ artist.image_url }}" alt="{{ artist.name }}" style="width:80px; border-radius:10px; margin:10px;">
+                                        {% endif %}
+                                        <p>{{ artist.name }}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <h4>{{ wrap.top_genre }}</h4>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Slide 7: Top Songs Playlist -->
+                <div class="story-slide">
+                    <h1>
+                        {% if language == 'es' %}Lista de Reproducción de Top 50
+                        {% elif language == 'bn' %}টপ ৫০ প্লেলিস্ট
+                        {% elif language == 'zh' %}前50首歌曲播放列表
+                        {% else %}Top 50 Tracks Playlist{% endif %}
+                    </h1>
+                    <div class="section">
+                        {% if wrap.top_tracks_images %}
+                            <div class="top-tracks-grid">
+                                {% for track in wrap.top_tracks_images %}
+                                    <div class="track-image-wrapper">
+                                        <img src="{{ track.image_url }}" alt="{{ track.name }}" class="track-image-playlist">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p>Not enough data to display top tracks images.</p>
+                        {% endif %}
+                        <h2>{% if language == 'es' %}¡Hemos creado una lista de reproducción con tus 50 canciones favoritas!
+                            {% elif language == 'bn' %}আমরা তোমার সেরা ৫০টি গানের একটি প্লেলিস্ট তৈরি করেছি!
+                            {% elif language == 'zh' %}我们为你创建了一个包含你最喜欢的50首歌的播放列表！
+                            {% else %}We created a playlist of your top 50 songs!{% endif %}</h2>
+                        <a href="/create_top_tracks_playlist/" target="_blank">{% if language == 'es' %}Abrir en Spotify
+                            {% elif language == 'bn' %}স্পটিফাইতে খুলুন
+                            {% elif language == 'zh' %}在Spotify上打开
+                            {% else %}Open in Spotify{% endif %}</a>
+                    </div>
+                </div>
+
+                <!-- Slide 8: Spotify Wrapped Summary -->
+                <div class="story-slide" id="summary-container">
+                    <h1>{% if language == 'es' %}Tu Spotify Wrapped
+                        {% elif language == 'bn' %}তোমার স্পটিফাই র‍্যাপড
+                        {% elif language == 'zh' %}你的Spotify年度总结
+                        {% else %}Your Spotify Wrapped{% endif %}</h1>
+                    <!-- Top Artist's Image -->
+                    {% if wrap.top_artist_image_url %}
+                        <div class="top-artist-image">
+                            <img src="{{ wrap.top_artist_image_url }}" alt="{% if language == 'es' %}Artista Principal
+                            {% elif language == 'bn' %}শীর্ষ শিল্পী
+                            {% elif language == 'zh' %}最喜欢的艺术家
+                            {% else %}Top Artist{% endif %}" style="width:200px; border-radius:50%;">
+                        </div>
+                    {% endif %}
+
+                    <!-- Top 5 Artists and Top 5 Tracks side by side -->
+                    <div class="top-section">
+                        <div class="top-artists">
+                            <h3> {% if language == 'es' %}Artistas Principales
+                                {% elif language == 'bn' %}শীর্ষ শিল্পীরা
+                                {% elif language == 'zh' %}最喜欢的艺术家
+                                {% else %}Top Artists{% endif %}</h3>
+                            <ul>
+                                {% for artist in wrap.top_artists %}
+                                    <li>{{ forloop.counter }}&nbsp;&nbsp;&nbsp;{{ artist.name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <div class="top-tracks">
+                            <h3>{% if language == 'es' %}Canciones Principales
+                                {% elif language == 'bn' %}শীর্ষ গানগুলি
+                                {% elif language == 'zh' %}最喜欢的歌曲
+                                {% else %}Top Tracks{% endif %}</h3>
+                            <ul>
+                                {% for track in wrap.top_tracks %}
+                                    <li>{{ forloop.counter }}&nbsp;&nbsp;&nbsp;{{ track.name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="arrow right-arrow" onclick="nextModalSlide('{{ wrap.id }}')">&gt;</div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="no-wraps">
+<p>You haven't saved any wraps yet.</p>
+<p>Go to your Spotify Wrapped to save your first wrap!</p>
+</div>
+{% endif %}
+</div>
+</div>
+
+
+
+    <script>
+     const themes = [
+            { class: "default", name: "Change Theme" },
+            { class: "dark-mode", name: "Dark Mode" },
+            { class: "halloween-theme", name: "Halloween Theme" },
+            { class: "christmas-theme", name: "Christmas Theme" }
+        ];
+        let currentThemeIndex = 0;
+
+        const themeToggleBtn = document.getElementById("theme-toggle-btn");
+        const snowContainer = document.getElementById("snowContainer");
+        const ghostContainer = document.getElementById("ghostContainer");
+
+        themeToggleBtn.addEventListener("click", () => {
+            document.body.classList.remove(themes[currentThemeIndex].class);
+
+            // Update theme index
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+
+            // Apply new theme
+            const newTheme = themes[currentThemeIndex];
+            document.body.classList.add(newTheme.class);
+            themeToggleBtn.textContent = newTheme.name;
+
+            // Manage special effects
+            if (newTheme.class === "christmas-theme") {
+                generateSnowflakes();
+                clearGhosts();
+            } else if (newTheme.class === "halloween-theme") {
+                generateGhosts();
+                clearSnowflakes();
+            } else {
+                clearSnowflakes();
+                clearGhosts();
+            }
+        });
+        
+        /**
+         * Generates and displays snowflake elements on the screen.
+         * Clears any existing snowflakes before generating new ones.
+         * Each snowflake is positioned randomly across the viewport width
+         * and assigned random animation delay and duration for a natural falling effect.
+         */
+        function generateSnowflakes() {
+            clearSnowflakes();
+            const numberOfSnowflakes = 100;
+            for (let i = 0; i < numberOfSnowflakes; i++) {
+                const snowflake = document.createElement("div");
+                snowflake.classList.add("snowflake");
+                snowflake.style.left = Math.random() * 100 + "vw";
+                snowflake.style.animationDelay = Math.random() * 10 + "s";
+                snowflake.style.animationDuration = 5 + Math.random() * 5 + "s";
+                snowContainer.appendChild(snowflake);
+            }
+        }
+     
+        /**
+         * Removes all snowflake elements from the screen.
+         * This is used to clear the snowflakes before generating new ones.
+         */
+        function clearSnowflakes() {
+            snowContainer.innerHTML = "";
+        }
+        
+        /**
+         * Generates and displays ghost elements on the screen.
+         * Clears any existing ghosts before generating new ones.
+         * Each ghost is positioned randomly across the viewport width,
+         * and assigned random animation delay and duration for a dynamic floating effect.
+         * Each ghost element also includes a child element representing its tail.
+         */
+        function generateGhosts() {
+            clearGhosts();
+            const numberOfGhosts = 20;
+            for (let i = 0; i < numberOfGhosts; i++) {
+                const ghost = document.createElement("div");
+                ghost.classList.add("ghost");
+
+                const ghostTail = document.createElement("div");
+                ghostTail.classList.add("ghost-tail");
+                ghost.appendChild(ghostTail);
+
+                ghost.style.left = Math.random() * 100 + "vw";
+                ghost.style.animationDelay = Math.random() * 5 + "s";
+                ghost.style.animationDuration = 4 + Math.random() * 4 + "s";
+
+                ghostContainer.appendChild(ghost);
+            }
+        }
+     
+        /**
+         * Removes all ghost elements from the screen.
+         * This is used to clear the ghosts before generating new ones.
+         */
+        function clearGhosts() {
+            ghostContainer.innerHTML = "";
+        }
+
+        let player;
+        let isTrackPlaying = false;
+        const trackUri = '{{ user_data.top_track.uri }}';  // URI of the track to play
+        const accessToken = '{{ request.session.access_token }}';  // Spotify access token
+        let device_id;
+        let deviceId;
+        /**
+         * Prepares Spotify Web Playback SDK
+         **/
+        window.onSpotifyWebPlaybackSDKReady = () => {
+            player = new Spotify.Player({
+                name: 'Your Spotify Wrapped Player',
+                getOAuthToken: cb => { cb(accessToken); },
+                volume: 0.5
+            });
+
+            // Ready event
+            player.addListener('ready', ({ device_id }) => {
+                console.log('Ready with Device ID', device_id);
+                deviceId = device_id;  // Save device ID for later use
+            });
+
+            // Error handling
+            player.addListener('initialization_error', ({ message }) => { console.error(message); });
+            player.addListener('authentication_error', ({ message }) => { console.error(message); });
+            player.addListener('account_error', ({ message }) => { console.error(message); });
+            player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+            player.addListener('player_state_changed', state => {
+                const isPlaying = !state.paused;
+                updateButtonVisibility(isPlaying);
+            })
+
+            // Connect to the player
+            player.connect();
+        };
+        /**
+         * Displays the modal for the given wrap ID and initializes its slides.
+         *
+         * @param {string} wrapId - The ID of the wrap whose modal should be displayed.
+         */
+        function showWrapDetails(wrapId) {
+            const modal = document.getElementById(`modal-${wrapId}`);
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            initializeModalSlides(wrapId);
+        }
+
+        /**
+         * Closes the modal for the given wrap ID and restores body scrolling.
+         *
+         * @param {string} wrapId - The ID of the wrap whose modal should be closed.
+         */
+        function closeModal(wrapId) {
+            const modal = document.getElementById(`modal-${wrapId}`);
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        /**
+         * Handles click events on the window.
+         * If the clicked element has the class 'modal', it hides the modal by setting its
+         * display style to 'none' and restores the page's scroll functionality by setting
+         * the body's overflow style to 'auto'.
+         *
+         * This is typically used to close modals when clicking outside their content.
+         *
+         * @param {MouseEvent} event - The click event triggered on the window.
+         */
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        /**
+         * Handles 'keydown' events on the document.
+         * Closes all open modals when the 'Escape' key is pressed by setting their
+         * display style to 'none' and restores the page's scroll functionality by
+         * setting the body's overflow style to 'auto'.
+         *
+         * This ensures a consistent and accessible way to close modals using the keyboard.
+         *
+         * @param {KeyboardEvent} event - The keydown event triggered on the document.
+         */
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modals = document.getElementsByClassName('modal');
+                for (let modal of modals) {
+                    modal.style.display = 'none';
+                }
+                document.body.style.overflow = 'auto';
+            }
+        });
+        const modalSlides = {};
+
+        /**
+         * Initializes the modal slides for the given wrap ID. This function sets up the
+         * current slide, slide elements, and tab elements for the modal.
+         *
+         * @param {string} wrapId - The ID of the wrap whose modal slides need to be initialized.
+         */
+        function initializeModalSlides(wrapId) {
+            if (!modalSlides[wrapId]) {
+                const modal = document.getElementById(`modal-${wrapId}`);
+                modalSlides[wrapId] = {
+                    currentSlide: 0,
+                    slides: modal.getElementsByClassName('story-slide'),
+                    tabs: modal.getElementsByClassName('tab')
+                };
+                updateModalSlide(wrapId);
+            }
+        }
+
+        /**
+         * Updates the display of slides and tabs for the modal corresponding to the given wrap ID.
+         * Only the current slide is shown, and the active class is toggled on the current tab.
+         *
+         * @param {string} wrapId - The ID of the wrap whose modal slides need to be updated.
+         */
+        function updateModalSlide(wrapId) {
+            const slideInfo = modalSlides[wrapId];
+            const { slides, tabs, currentSlide } = slideInfo;
+
+            Array.from(slides).forEach((slide, index) => {
+                slide.style.display = index === currentSlide ? 'block' : 'none';
+                slide.classList.toggle('active', index === currentSlide);
+            });
+
+            Array.from(tabs).forEach((tab, index) => {
+                tab.classList.toggle('active', index === currentSlide);
+            });
+        }
+
+        /**
+         * Advances to the next slide in the modal for the given wrap ID, if available.
+         *
+         * @param {string} wrapId - The ID of the wrap whose modal slide should advance.
+         */
+        function nextModalSlide(wrapId) {
+            const slideInfo = modalSlides[wrapId];
+            if (slideInfo.currentSlide < slideInfo.slides.length - 1) {
+                slideInfo.currentSlide++;
+                updateModalSlide(wrapId);
+            }
+        }
+
+        /**
+         * Moves to the previous slide in the modal for the given wrap ID, if available.
+         *
+         * @param {string} wrapId - The ID of the wrap whose modal slide should go back.
+         */
+        function prevModalSlide(wrapId) {
+            const slideInfo = modalSlides[wrapId];
+            if (slideInfo.currentSlide > 0) {
+                slideInfo.currentSlide--;
+                updateModalSlide(wrapId);
+            }
+        }
+
+        /**
+         * Navigates to a specific slide in the modal for the given wrap ID.
+         *
+         * @param {string} wrapId - The ID of the wrap whose modal slide should navigate.
+         * @param {number} index - The index of the slide to navigate to.
+         */
+        function goToModalSlide(wrapId, index) {
+            const slideInfo = modalSlides[wrapId];
+            slideInfo.currentSlide = index;
+            updateModalSlide(wrapId);
+        }
+
+        /**
+         * Plays the top track on the user's active Spotify device.
+         * The function sends a request to Spotify's Web API to start playback using the given device ID.
+         *
+         * @throws {Error} Logs an error to the console if playback fails.
+         */
+        function playTopTrack() {
+            const subscriptionType = "{{ wrap.subscription_type }}"; // Make sure this value is passed to the template
+            if (subscriptionType === 'free') {
+                alert("Sorry, you can't play your top tracks because you don't have a Spotify Premium account.");
+                return; // Exit the function if the user doesn't have Premium
+            }
+            if (!deviceId) {
+                console.error("Device ID is not ready yet.");
+                return;
+            }
+            const trackUri = "{{ user_data.top_track.uri }}";
+            console.log("Track URI being sent:", trackUri);
+
+            // Make a fetch request to start playback on the player
+            fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    uris: ["{{ user_data.top_track.uri }}"]  // URI for the top track
+                })
+            }).then(response => {
+                if (response.ok) {
+                    updateButtonVisibility(true);
+                } else {
+                    console.error("Failed to start playback:", response);
+                }
+            }).catch(error => console.error(error));
+        }
+
+        /**
+         * Pauses the currently playing track using the Spotify Web Playback SDK.
+         *
+         * @throws {Error} Logs an error to the console if pausing playback fails.
+         */
+        function pauseTrack() {
+            player.pause().then(() => {
+                updateButtonVisibility(false);  // Show play button
+            }).catch(error => console.error("Failed to pause playback:", error));
+        }
+        const translations = {
+    en: {
+        navbar: {
+            home: 'Home',
+            profile: 'Profile',
+            myWrapped: 'My Wrapped',
+            publicWraps: 'Public Wraps',
+            logout: 'Logout',
+            langToggle: 'English',
+            deleteAccount: 'Delete Account',
+        },
+        profileHeader: "Your Profile",
+        wraps: {
+            topArtist: "Top Artist",
+            topTrack: "Top Track",
+            topGenre: "Top Genre",
+            createdOn: "Created on",
+            makePublic: "Make Public",
+            makePrivate: "Make Private",
+            deleteWrap: "Delete Wrap",
+        },
+        modal: {
+            slideTopArtist: "Your Top Artist",
+            slideTopTrack: "Your Top Track",
+            slideTopGenre: "Your Top Genre",
+            slideTop50Playlist: "Top 50 Tracks Playlist",
+            slideSpotifyWrapped: "Your Spotify Wrapped",
+        },
+        noWrapsText: {
+            title: "You haven't saved any wraps yet.",
+            subtitle: "Go to your Spotify Wrapped to save your first wrap!",
+        },
+        themeToggle: "Change Theme",
+    },
+    es: {
+        navbar: {
+            home: 'Inicio',
+            profile: 'Perfil',
+            myWrapped: 'Mi Wrapped',
+            publicWraps: 'Envoltorios Públicos',
+            logout: 'Cerrar sesión',
+            langToggle: 'Español',
+            deleteAccount: 'Eliminar Envoltorio',
+        },
+        profileHeader: "Tu Perfil",
+        wraps: {
+            topArtist: "Artista Principal",
+            topTrack: "Canción Principal",
+            topGenre: "Género Principal",
+            createdOn: "Creado el",
+            makePublic: "Hacer Público",
+            makePrivate: "Hacer Privado",
+            deleteWrap: "Eliminar Envoltorio",
+        },
+        modal: {
+            slideTopArtist: "Tu Artista Principal",
+            slideTopTrack: "Tu Canción Principal",
+            slideTopGenre: "Tu Género Principal",
+            slideTop50Playlist: "Lista de Reproducción de Top 50",
+            slideSpotifyWrapped: "Tu Spotify Wrapped",
+            slideGuessArtist: "Adivina el Artista",
+            SlideGuessSong: "Adivina la Canción",
+        },
+        noWrapsText: {
+            title: "Aún no has guardado ningún envoltorio.",
+            subtitle: "¡Ve a tu Spotify Wrapped para guardar tu primer envoltorio!",
+        },
+        themeToggle: "Cambiar Tema",
+    },
+    bn: {
+        navbar: {
+            home: 'হোম',
+            profile: 'প্রোফাইল',
+            myWrapped: 'আমার র‍্যাপড',
+            publicWraps: 'পাবলিক র‍্যাপড',
+            logout: 'লগ আউট',
+            langToggle: 'বাংলা',
+            deleteAccount: 'অ্যাকাউন্ট মুছে ফেলুন',
+        },
+        profileHeader: "তোমার প্রোফাইল",
+        wraps: {
+            topArtist: "শীর্ষ শিল্পী",
+            topTrack: "শীর্ষ গান",
+            topGenre: "শীর্ষ ধরন",
+            createdOn: "তৈরি হয়েছে",
+            makePublic: "পাবলিক করো",
+            makePrivate: "প্রাইভেট করো",
+            deleteWrap: "র‍্যাপড মুছে ফেলো",
+        },
+        modal: {
+            slideTopArtist: "তোমার শীর্ষ শিল্পী",
+            slideTopTrack: "তোমার শীর্ষ গান",
+            slideTopGenre: "তোমার শীর্ষ ধরন",
+            slideTop50Playlist: "শীর্ষ ৫০ প্লেলিস্ট",
+            slideSpotifyWrapped: "তোমার Spotify Wrapped",
+            slideGuessArtist: "গান অনুমান করুন",
+            SlideGuessSong: "িল্পী অনুমান করুন",
+        },
+        noWrapsText: {
+            title: "তুমি এখনো কোন র‍্যাপড সংরক্ষণ করো নি।",
+            subtitle: "তোমার প্রথম র‍্যাপড সংরক্ষণ করতে Spotify Wrapped এ যাও!",
+        },
+        themeToggle: "থিম পরিবর্তন করো",
+    },
+    zh: {
+        navbar: {
+            home: '主页',
+            profile: '个人资料',
+            myWrapped: '我的 Wrapped',
+            publicWraps: '公开的 Wrapped',
+            logout: '退出',
+            langToggle: '中文',
+            deleteAccount: '删除账户',
+        },
+        profileHeader: "你的个人资料",
+        wraps: {
+            topArtist: "最喜欢的艺术家",
+            topTrack: "最喜欢的歌曲",
+            topGenre: "最喜欢的音乐类型",
+            createdOn: "创建于",
+            makePublic: "设为公开",
+            makePrivate: "设为私密",
+            deleteWrap: "删除 Wrapped",
+        },
+        modal: {
+            slideTopArtist: "你最喜欢的艺术家",
+            slideTopTrack: "你最喜欢的歌曲",
+            slideTopGenre: "你最喜欢的音乐类型",
+            slideTop50Playlist: "前50首歌曲播放列表",
+            slideSpotifyWrapped: "你的 Spotify 年度总结",
+            slideGuessArtist: "猜猜艺术家",
+            SlideGuessSong: "猜猜这首歌",
+        },
+        noWrapsText: {
+            title: "你还没有保存任何 Wrapped。",
+            subtitle: "去你的 Spotify Wrapped 保存第一个吧！",
+        },
+        themeToggle: "更改主题",
+    },
+};
+let currentLanguage = 'en';
+
+/**
+ * Toggles the application language and updates all text elements to match the selected language.
+ * The supported languages are cycled through in the order: English (en) -> Spanish (es) -> Bengali (bn) -> Chinese (zh).
+ * 
+ * This function:
+ * - Updates navigation bar links and buttons.
+ * - Translates the profile header.
+ * - Updates text content within user-created wrap cards, including the "Created on" date prefix while preserving the original date.
+ * - Updates modal slide content to reflect the current language.
+ * - Updates messages shown when no wraps are available.
+ * - Updates the text of the theme toggle button.
+ *
+ * This function relies on a `translations` object containing language-specific strings for the interface.
+ * The `currentLanguage` variable tracks the current language state and is updated within this function.
+ */
+function toggleLanguage() {
+    const langToggleButton = document.querySelector('#lang-toggle-btn');
+    const navLinks = document.querySelectorAll('.nav-bar a');
+    const profileHeader = document.querySelector('h1');
+    const wrapCards = document.querySelectorAll('.wrap-card');
+    const themeToggleButton = document.querySelector('#theme-toggle-btn');
+    const noWrapsTitle = document.querySelector('.no-wraps p:first-child');
+    const noWrapsSubtitle = document.querySelector('.no-wraps p:last-child');
+    const logoutButton = document.querySelector('.logout-button');
+    const deleteButton = document.querySelector('#delete-account-button');
+
+    // Cycle through languages: en -> es -> bn -> zh
+    if (currentLanguage === 'en') {
+        currentLanguage = 'es';
+    } else if (currentLanguage === 'es') {
+        currentLanguage = 'bn';
+    } else if (currentLanguage === 'bn') {
+        currentLanguage = 'zh';
+    } else {
+        currentLanguage = 'en';
+    }
+
+    const translation = translations[currentLanguage];
+
+    // Update navbar
+    navLinks[0].textContent = translation.navbar.home;
+    navLinks[1].textContent = translation.navbar.profile;
+    navLinks[2].textContent = translation.navbar.myWrapped;
+    navLinks[3].textContent = translation.navbar.publicWraps;
+    logoutButton.textContent = translation.navbar.logout;
+    langToggleButton.textContent = translation.navbar.langToggle;
+    deleteButton.textContent = translation.navbar.deleteAccount;
+
+    // Update profile header
+    profileHeader.textContent = translation.profileHeader;
+
+    // Update wraps
+    wrapCards.forEach((card) => {
+        card.querySelector('.wrap-content h3:nth-child(1)').textContent = translation.wraps.topArtist;
+        card.querySelector('.wrap-content h3:nth-child(3)').textContent = translation.wraps.topTrack;
+        card.querySelector('.wrap-content h3:nth-child(5)').textContent = translation.wraps.topGenre;
+
+        // Update only the "Created on" prefix without removing the date
+        const wrapDateElement = card.querySelector('.wrap-date');
+        if (wrapDateElement) {
+            const originalDate = wrapDateElement.dataset.originalDate || wrapDateElement.textContent.split(/Created on|Creado el|তৈরি হয়েছে|创建于/)[1]?.trim();
+            wrapDateElement.dataset.originalDate = originalDate || "";
+            wrapDateElement.textContent = `${translation.wraps.createdOn} ${originalDate}`;
+        }
+    });
+
+    document.querySelectorAll('.modal').forEach((wrap) => {
+            const modalSlides = wrap.querySelectorAll('.story-slide');
+            modalSlides.forEach((slide, index) => {
+                const h1 = slide.querySelector('h1');
+                if (h1) {
+                    // Match each slide index and update with the corresponding translation
+                    switch (index) {
+                        case 0:
+                            h1.textContent = translation.modal.slideSpotifyWrapped || "Welcome to Your Spotify Wrapped!";
+                            break;
+                        case 1:
+                            h1.textContent = translation.modal.slideGuessArtist || "Guess the Artist";
+                            break;
+                        case 2:
+                            h1.textContent = translation.modal.slideTopArtist || "Your Top Artist";
+                            break;
+                        case 3:
+                            h1.textContent = translation.modal.slideGuessSong || "Guess the Song";
+                            break;
+                        case 4:
+                            h1.textContent = translation.modal.slideTopTrack || "Your Top Track";
+                            break;
+                        case 5:
+                            h1.textContent = translation.modal.slideTopGenre || "Your Top Genre";
+                            break;
+                        case 6:
+                            h1.textContent = translation.modal.slideTop50Playlist || "Top 50 Tracks Playlist";
+                            break;
+                        case 7:
+                            h1.textContent = translation.modal.slideSpotifyWrapped || "Your Spotify Wrapped";
+                            break;
+                    }
+                }
+            });
+        });
+
+    // Update no-wraps message
+    if (noWrapsTitle) noWrapsTitle.textContent = translation.noWrapsText.title;
+    if (noWrapsSubtitle) noWrapsSubtitle.textContent = translation.noWrapsText.subtitle;
+
+    // Update theme toggle button
+    themeToggleButton.textContent = translation.themeToggle;
+}
+
+let randomStartMs = null;
+        /**
+         * Plays a 1-second snippet of a track using Spotify's Web Playback API.
+         * 
+         * Function behavior:
+         * - Checks if the user has a Spotify Premium subscription. If not, shows an alert and exits.
+         * - Ensures the Spotify Web Player's `deviceId` is ready. If not, logs an error and exits.
+         * - Generates or uses a pre-existing random start position for playback within the track duration.
+         * - Starts playback of the specified track at the generated random position.
+         * - Pauses playback after 1 second to create a snippet effect.
+         * 
+         * Dependencies:
+         * - `deviceId`: The ID of the active Spotify device (required).
+         * - `accessToken`: A valid Spotify API access token with necessary playback permissions.
+         * - `randomStartMs`: A global variable that stores the random start position for the snippet.
+         * - Template variables:
+         *   - `wrap.subscription_type`: The user's Spotify subscription type (e.g., "free", "premium").
+         *   - `user_data.guess_song_game.duration`: The track's duration in milliseconds.
+         *   - `user_data.guess_song_game.uri`: The Spotify URI for the track to play.
+         * 
+         * Spotify API endpoints used:
+         * - `PUT /v1/me/player/play`: Starts playback on the specified device.
+         * - `PUT /v1/me/player/seek`: Seeks to a specific position in the track.
+         * - `PUT /v1/me/player/pause`: Pauses playback.
+         * 
+         * Error Handling:
+         * - Alerts the user if they do not have Spotify Premium.
+         * - Logs errors related to device readiness, playback initiation, seeking, and pausing.
+         */
+        function playSnippet() {
+            const subscriptionType = "{{ wrap.subscription_type }}"; // Make sure this value is passed to the template
+            if (subscriptionType === 'free') {
+                alert("Sorry, you can't play this snippet because you don't have a Spotify Premium account.");
+                return; // Exit the function if the user doesn't have Premium
+            }
+            if (!deviceId) {
+                console.error("Device ID is not ready yet.");
+                return;
+            }
+            const trackDuration = "{{ user_data.guess_song_game.duration }}";
+            const trackUri = "{{ user_data.guess_song_game.uri }}";
+            if (randomStartMs === null) {
+                randomStartMs = Math.floor(Math.random() * (trackDuration - 1000));
+            } else {
+                console.log("Using previously set random start position:", randomStartMs, "ms");
+            }
+            console.log("Track URI being sent:", trackUri);
+
+            // Make a fetch request to start playback on the player
+            fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    uris: ["{{ user_data.guess_song_game.uri }}"]  // URI for the top track
+                })
+            }).then(response => {
+                if (response.ok) {
+                    console.log("Playback started. Seeking to random position...");
+                    // Seek to the random position
+                    fetch(`https://api.spotify.com/v1/me/player/seek?position_ms=${randomStartMs}&device_id=${deviceId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(seekResponse => {
+                        if (seekResponse.ok) {
+                            console.log("Seek successful. Playing snippet...");
+                            // Pause playback after 1 second
+                            setTimeout(() => {
+                                fetch(`https://api.spotify.com/v1/me/player/pause?device_id=${deviceId}`, {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Authorization': `Bearer ${accessToken}`,
+                                        'Content-Type': 'application/json',
+                                    }
+                                }).then(pauseResponse => {
+                                    if (!pauseResponse.ok) {
+                                        console.error("Failed to pause playback:", pauseResponse);
+                                    } else {
+                                        console.log("Snippet playback paused.");
+                                    }
+                                }).catch(error => console.error("Error pausing playback:", error));
+                            }, 1000); // Play for 1 second
+                        } else {
+                            console.error("Failed to seek:", seekResponse);
+                        }
+                    }).catch(error => console.error("Error during seek:", error));
+                } else {
+                    console.error("Failed to start playback:", response);
+                }
+            })
+            .catch(error => console.error("Error starting playback:", error));
+        }
+
+        // Initialize
+        updateSlide();
+        /**
+         * Checks if the selected answer matches the correct artist.
+         * Updates the result message and its style color based on whether the answer is correct.
+         * 
+         * @param {string} selected - The selected artist's name.
+         * @param {string} correct - The correct artist's name.
+         * 
+         * Behavior:
+         * - If the selected artist matches the correct one:
+         *   - Displays "Correct! 🎉" in white text.
+         * - Otherwise:
+         *   - Displays "Incorrect! Try again." in red text.
+         * 
+         * Dependencies:
+         * - An HTML element with the ID 'resultArtist' must exist to display the result message.
+         */
+        function checkAnswerArtist(selected, correct) {
+            const resultArtist = document.getElementById('resultArtist');
+            if (selected === correct) {
+                resultArtist.textContent = "Correct! 🎉";
+                resultArtist.style.color = "white";
+            } else {
+                resultArtist.textContent = "Incorrect! Try again.";
+                resultArtist.style.color = "red";
+            }
+        }
+
+        /**
+         * Checks if the selected answer matches the correct one.
+         * Updates the result message and its style color based on whether the answer is correct.
+         * 
+         * @param {string} selected - The selected answer.
+         * @param {string} correct - The correct answer.
+         * 
+         * Behavior:
+         * - If the selected answer matches the correct one:
+         *   - Displays "Correct! 🎉" in white text.
+         * - Otherwise:
+         *   - Displays "Incorrect! Try again." in red text.
+         * 
+         * Dependencies:
+         * - An HTML element with the ID 'result' must exist to display the result message.
+         */
+        function checkAnswer(selected, correct) {
+            const result = document.getElementById('result');
+            if (selected === correct) {
+                result.textContent = "Correct! 🎉";
+                result.style.color = "white";
+            } else {
+                result.textContent = "Incorrect! Try again.";
+                result.style.color = "red";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,440 @@
+
+    /* Global Theme Styles */
+    :root {
+        --primary-color: #a28ce3;
+        --secondary-color: #191414;
+        --button-color: #a28ce3;
+        --text-color: white;
+    }
+    /* Dark Mode */
+    .dark-mode {
+        --primary-color: #03280a;
+        --secondary-color: #0c0c0c;
+        --button-color: #022208;
+        --text-color: #cccccc;
+    }
+    /* Halloween Mode */
+    .halloween-mode {
+        --primary-color: #f0701b;
+        --secondary-color: #000000;
+        --button-color: #ff7518;
+        --text-color: #ffffff;
+    }
+    /* Christmas Mode */
+    .christmas-mode {
+        --primary-color: #ff0000;
+        --secondary-color: #008000;
+        --button-color: #ff0000;
+        --text-color: white;
+    }
+
+    /* Base Styles */
+    body {
+        background: linear-gradient(45deg, #450af5, #c4efd9); /* Default theme background */
+        color: var(--text-color);
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        transition: background 0.5s ease, color 0.5s ease;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    body.dark-mode {
+       background: linear-gradient(135deg, #03280a, #0c0c0c);
+    }
+
+    body.halloween-mode {
+        background: radial-gradient(circle, #f0701b, #000000);
+    }
+
+    body.christmas-mode {
+        background: radial-gradient(circle, #ff0000, #390101);
+    }
+
+        .dark-mode .theme-toggle {
+            background-color: #17a249;
+        }
+        .dark-mode .lang-toggle {
+            background-color: #17a249;
+        }
+        .dark-mode .back-button {
+            background-color: #17a249;
+        }
+        .dark-mode .back-button:hover {
+            background-color: #022208;
+        }
+        .dark-mode .theme-toggle:hover {
+            background-color: #022208;
+        }
+        .dark-mode .lang-toggle:hover {
+            background-color: #022208;
+        }
+
+        .halloween-mode .theme-toggle {
+            background-color: #ff7518;
+        }
+        .halloween-mode .lang-toggle {
+            background-color: #ff7518;
+        }
+        .halloween-mode .back-button {
+            background-color: #ff7518;
+        }
+        .halloween-mode .back-button:hover {
+            background-color: #a14706;
+        }
+        .halloween-mode .theme-toggle:hover {
+            background-color: #a14706;
+        }
+         .halloween-mode .lang-toggle:hover {
+            background-color: #a14706;
+        }
+
+        .christmas-mode .theme-toggle {
+            background-color: #ff0000;
+        }
+        .christmas-mode .lang-toggle {
+            background-color: #ff0000;
+        }
+        .christmas-mode .back-button {
+            background-color: #ff0000;
+        }
+        .christmas-mode .back-button:hover {
+           background-color: #17a249;
+        }
+        .christmas-mode .theme-toggle:hover {
+           background-color: #17a249;
+        }
+        .christmas-mode .lang-toggle:hover {
+           background-color: #17a249;
+        }
+    h1 {
+        font-size: 2em;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    /* Genre List Container */
+    ul {
+        list-style-type: none;
+        padding: 0;
+        width: 100%;
+        max-width: 400px;
+    }
+
+    /* Genre Box Styling */
+    .genre-box {
+        background-color: #000;
+        color: white;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 10px 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 1.2em;
+        font-weight: bold;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        text-transform: capitalize
+    }
+
+    .theme-toggle {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background-color: var(--button-color);
+        color: var(--text-color);
+        border: none;
+        padding: 10px 20px;
+        font-size: 1em;
+        cursor: pointer;
+        border-radius: 25px;
+        transition: background-color 0.3s ease;
+    }
+
+    .lang-toggle {
+        position: absolute;
+        top: 20px;
+        padding: 10px 20px;
+        background-color: var(--button-color);
+        color: var(--text-color);
+        border: none;
+        font-size: 1em;
+        cursor: pointer;
+        border-radius: 25px;
+        transition: background-color 0.3s ease;
+        right: 250px;
+    }
+
+    .theme-toggle:hover,
+    .lang-toggle:hover {
+        background-color: #68549a;
+    }
+
+    /* Back Button */
+    .back-button {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        background-color: #a28ce3;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        font-size: 1em;
+        cursor: pointer;
+        border-radius: 25px;
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        transition: background-color 0.3s ease;
+        z-index: 10;
+        text-decoration: none;
+    }
+
+    .back-button:hover {
+        background-color: #68549a;
+    }
+
+    /* Animated background elements */
+    .background-shapes {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+    }
+
+    .shape {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        animation: floatShape 20s infinite linear;
+    }
+
+    @keyframes floatShape {
+        0% {
+            transform: translate(0, 0) rotate(0deg);
+        }
+        100% {
+            transform: translate(var(--moveX), var(--moveY)) rotate(360deg);
+        }
+    }
+
+    /* Responsive design */
+    @media (max-width: 768px) {
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .display-section {
+            grid-template-columns: 1fr;
+        }
+    }
+    /* Snowflakes */
+        .snow-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .snowflake {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+            animation: fall 10s linear infinite, sway 5s ease-in-out infinite;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-10px);
+                opacity: 0.9;
+            }
+            100% {
+                transform: translateY(100vh);
+                opacity: 0.2;
+            }
+        }
+
+
+
+        /* Ghosts */
+        .ghost-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .ghost {
+            position: absolute;
+            width: 50px;
+            height: 70px;
+            background-color: white;
+            border-radius: 50% 50% 40% 40%;
+            animation: ghostFly 6s linear infinite, ghostSway 3s ease-in-out infinite;
+            opacity: 0.8;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+        }
+
+        .ghost::before,
+        .ghost::after {
+            content: '';
+            position: absolute;
+            top: 20%;
+            width: 10px;
+            height: 10px;
+            background-color: black;
+            border-radius: 50%;
+        }
+
+        .ghost::before {
+            left: 25%;
+        }
+
+        .ghost::after {
+            right: 25%;
+        }
+
+
+
+        @keyframes ghostFly {
+            0% {
+                transform: translateY(100vh) scale(1);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.2);
+                opacity: 1;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            /* Navigation adjustments */
+            .nav-bar {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            /* Theme and Language toggle buttons */
+            .theme-toggle, .lang-toggle {
+                position: static;
+                width: 80%;
+                margin: 5px auto;
+            }
+            
+            /* Story tabs spacing */
+            .story-tabs {
+                gap: 5px;
+            }
+            
+            /* Track box adjustments */
+            .track-box {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            /* Summary container */
+            #summary-container {
+                padding: 10px;
+            }
+            
+            /* Top section layout */
+            .top-section {
+                flex-direction: column;
+            }
+            
+            .top-section > div {
+                width: 100%;
+            }
+        }
+        
+        @media screen and (max-width: 480px) {
+            /* Further adjustments for very small screens */
+            .wrapper {
+                padding: 10px;
+            }
+            
+            /* Grid adjustments */
+            .top-tracks-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Artist cards */
+            .matching-artists {
+                flex-direction: column;
+            }
+            
+            .artist-card {
+                width: 100%;
+                max-width: 200px;
+                margin: 10px auto;
+            }
+            
+            /* Buttons */
+            .guess-button {
+                width: 80%;
+            }
+            
+            #playTopTrack, #pauseTrack {
+                width: 80%;
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            html {
+                font-size: 14px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            h2 {
+                font-size: 1.3em;
+            }
+            
+            .track-name {
+                font-size: 0.9em;
+            }
+            
+            .artist-name {
+                font-size: 0.8em;
+            }
+        }
+
+        @media (hover: none) {
+            /* Increase touch targets */
+            .arrow {
+                padding: 20px;
+            }
+            
+            .tab {
+                min-height: 30px;
+                min-width: 30px;
+            }
+            
+            /* Increase button spacing */
+            .guess-button,
+            #playTopTrack,
+            #pauseTrack,
+            .save-wrap-button {
+                margin: 15px auto;
+                min-height: 44px; /* Standard minimum touch target size */
+            }
+        }

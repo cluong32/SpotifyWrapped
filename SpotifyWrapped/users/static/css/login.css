@@ -1,0 +1,138 @@
+#title-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#title {
+    text-align: center;
+    margin: 15px auto;
+    font-size: 60px;
+    color: black;
+}
+
+#button-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px auto;
+}
+
+.button {
+    border: 1px solid black;
+    color: black;
+    padding: 30px 30px;
+    font-size: 30px;
+    cursor: pointer;
+    border-radius: 12px;
+    text-align: center;
+    opacity: 0.65;
+    transition: 0.3s;
+}
+.button:hover {opacity: 1}
+
+#image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo {
+    width: 300px;
+    height: auto;
+}
+body {
+            background: linear-gradient(45deg, #450af5, #c4efd9);
+            font-family: Arial, sans-serif;
+            color: white;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column; /* Stacks .container on top of .displaySection */
+            align-items: center;
+            text-align: center;
+            transition: background 0.5s ease, color 0.5s ease;
+            position: relative; /* Keeps corner images positioned correctly */
+            overflow-x: hidden;
+            overflow-y: hidden;
+        }
+
+        .displaySection {
+            display: flex; /* Ensures contents are displayed side by side */
+            justify-content: space-around; /* Adds space between each item */
+            width: 66.67%; /* Makes the div take up two-thirds of the page */
+            padding: 20px; /* Adds padding for a cleaner look */
+            margin: auto; /* Centers the section */
+            border-radius: 10px; /* Optional: adds rounded corners */
+            color: black; /* Sets text color for better contrast on light background */
+        }
+
+        .wrapped p {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            text-align: center;
+          }
+
+        /* Animated background elements */
+        .background-shapes{
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: floatShape 20s infinite linear;
+        }
+
+        @keyframes floatShape {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            100% {
+                transform: translate(var(--moveX), var(--moveY)) rotate(360deg);
+            }
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .display-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (hover: none) {
+            /* Increase touch targets */
+            .arrow {
+                padding: 20px;
+            }
+            
+            .tab {
+                min-height: 30px;
+                min-width: 30px;
+            }
+            
+            /* Increase button spacing */
+            .guess-button,
+            #playTopTrack,
+            #pauseTrack,
+            .save-wrap-button {
+                margin: 15px auto;
+                min-height: 44px; /* Standard minimum touch target size */
+            }
+        }

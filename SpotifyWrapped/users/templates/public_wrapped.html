@@ -1,0 +1,37 @@
+<!-- public_wrapped.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Public Spotify Wraps</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/public_wrapped.css' %}">
+</head>
+<body>
+    <h1>All Public Spotify Wrapped</h1>
+    <div class="wraps">
+        {% for wrap in public_wraps %}
+            <div class="wrap">
+                <h2>{{ wrap.user.username }}'s Wrapped</h2>
+                <h3>Top Artist</h3>
+                <p>{{ wrap.top_artist }}</p>
+        
+                <h3>Top Track</h3>
+                <p>{{ wrap.top_track }}</p>
+        
+                <h3>Top Genre</h3>
+                <div class="content-genre">
+                    <p>{{ wrap.top_genre }}</p>
+                </div>
+                {% if wrap.playlist_url %}
+                    <p><a href="{{ wrap.playlist_url }}" target="_blank">View Playlist</a></p>
+                {% endif %}
+                <p>Posted on: {{ wrap.created_at|date:"F j, Y" }}</p>
+            </div>
+        {% empty %}
+            <p>No public wraps yet. Be the first to post yours!</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,776 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Public Spotify Wraps</title>
+    <!-- Reference the public_wrapped.css file -->
+    <link rel="stylesheet" href="{% static 'css/public_wrapped.css' %}">
+</head>
+<body>
+    <div class="nav-bar">
+         <a href="{% url 'users:home' %}" class="nav-home">Home</a>
+    <a href="{% url 'users:profile' %}" class="nav-profile">Profile</a>
+    <a href="{% url 'users:spotify_wrapped' %}" class="nav-my-wrapped">My Wrapped</a>
+    <a href="{% url 'users:public_wraps' %}" class="nav-public-wraps">Public Wraps</a>
+    <button class="lang-toggle" onclick="toggleLanguage()">English</button>
+    <button class="theme-toggle" onclick="toggleTheme()">Change Theme</button>
+    </div>
+<div class="snow-container" id="snowContainer"></div>
+    <div class="ghost-container" id="ghostContainer"></div>
+    <div class="container">
+        <h1 class="page-header">Public Spotify Wraps</h1>
+
+        {% if not is_authenticated %}
+            <div class="auth-banner">
+                <p>Want to share your own Spotify Wrapped?</p>
+                <a href="{% url 'users:spotify_login' %}" class="playlist-link">Login with Spotify</a>
+            </div>
+        {% endif %}
+        {% load static %}
+        <div class="wraps-container">
+            {% if public_wraps %}
+                {% for wrap in public_wraps %}
+                    <div class="wrap-card" onclick="showWrapDetails('{{ wrap.id }}')">
+                        <div class="wrap-date" data-creator="{{ wrap.spotify_display_name }}" data-date="{{ wrap.created_at|date:'F j, Y' }}">
+  Created by {{ wrap.spotify_display_name }} on {{ wrap.created_at|date:"F j, Y" }}
+</div>
+                        <div class="wrap-content">
+                            <h3 class="top-artist">Top Artist</h3>
+                            <p>{{ wrap.top_artist }}</p>
+
+                            <h3 class="top-track">Top Track</h3>
+                            <p>{{ wrap.top_track }}</p>
+
+                            <h3 class="top-genre">Top Genre</h3>
+                            <div class="content-genre">
+                                <p>{{ wrap.top_genre }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal for this wrap -->
+                    <div id="modal-{{ wrap.id }}" class="modal">
+                        <div class="modal-content">
+                            <button class="close-button" onclick="closeModal('{{ wrap.id }}')">&times;</button>
+
+                            <div class="story-tabs">
+            <div class="tab active" onclick="goToModalSlide('{{ wrap.id }}', 0)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 1)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 2)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 3)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 4)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 5)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 6)"></div>
+            <div class="tab" onclick="goToModalSlide('{{ wrap.id }}', 7)"></div>
+        </div>
+
+        <div class="stories">
+            <div class="arrow left-arrow" onclick="prevModalSlide('{{ wrap.id }}')">&lt;</div>
+                <!-- Slide 1: Welcome to Spotify Wrapped -->
+                <div class="story-slide acitve">
+                    <div class="section">
+                        <img src="{% static 'images/Spotify_logo.png' %}" alt="Spotify logo" class="logo">
+                        <h1>Welcome to Your Spotify Wrapped!</h1>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Guess Top Artist -->
+                <div class="story-slide">
+
+                    <h1>Guess the Artist</h1>
+                    <div class="section">
+                        {% if wrap.top_artist %}
+                            <!-- Display the genres of the top artist -->
+                            <p><strong>Your top artist's genre:</strong>
+                                <div class="guess-artist-genre">
+                                    {{ wrap.top_genre }}
+                                </div>
+                            </p>
+
+                            <!-- Buttons for guessing the artist -->
+                            <p>Guess who your top artist is!</p>
+                            <ul>
+                                {% for choice in wrap.top_3_artists %}
+                                    <li>
+                                        <button class="guess-button" onclick="checkAnswerArtist('{{ choice.name }}', '{{ wrap.top_artist }}')">
+                                            {{ choice.name }}
+                                        </button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <p id="resultArtist"></p>
+                        {% else %}
+                            <p>Unable to fetch artist information. Please try again later.</p>
+                        {% endif %}
+
+                    </div>
+                </div>
+
+                <!-- Slide 3: Top Artist -->
+                <div class="story-slide">
+                    <h1>
+                        {% if language == 'es' %}Tu Artista Principal
+                        {% elif language == 'bn' %}তোমার শীর্ষ শিল্পী
+                        {% elif language == 'zh' %}你最喜欢的艺术家
+                        {% else %}Your Top Artist{% endif %}
+                    </h1>
+                    {% if wrap.top_artist %}
+                        <div class="section">
+                            <img class="artist-image" src="{{ wrap.top_artist_image_url }}" alt="{{ wrap.top_artist }}">
+                            <h2>{{ wrap.top_artist }}</h2>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Slide 4: Guess Top Track -->
+                <div class="story-slide">
+                    <h1>Guess the Song</h1>
+                    <div class="section">
+                        {% if wrap.top_track %}
+                            <button class="guess-button" onclick="playSnippet()"> Play</button>
+                            <p>Guess one of your top tracks from this snippet!</p>
+                            <ul>
+                                {% for choice in wrap.top_3_tracks %}
+                                    <li>
+                                        <button class="guess-button" onclick="checkAnswer('{{ choice.name }}', '{{ wrap.guess_song_game.name }}')">
+                                            {{ choice.name }}
+                                        </button>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            <p id="result"></p>
+                        {% else %}
+                            <p>Unable to fetch a song snippet. Please try again later.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Slide 5: Top Track -->
+                <div class="story-slide">
+                    <h1>
+                        {% if language == 'es' %}Tu Canción Principal
+                        {% elif language == 'bn' %}তোমার শীর্ষ গান
+                        {% elif language == 'zh' %}你最喜欢的歌曲
+                        {% else %}Your Top Track{% endif %}
+                    </h1>
+                    {% if wrap.top_track %}
+                        <div class="section">
+                            <img class="track-image" src="{{ wrap.top_track_image_url }}" alt="{{ wrap.top_track }}">
+                             <h2>{{ wrap.top_track }}</h2>
+                            <!-- Play Button -->
+                            <button id='playTopTrack' onclick="playTopTrack()">Play Top Track</button>
+                            <button id='pauseTrack' onclick="pauseTrack()">Pause </button>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Slide 6: Top Genre -->
+                <div class="story-slide">
+                    <h1>{% if language == 'es' %}Tu Género Principal
+                        {% elif language == 'bn' %}তোমার শীর্ষ ধরন
+                        {% elif language == 'zh' %}你最喜欢的音乐类型
+                        {% else %}Your Top Genre{% endif %}</h1>
+                    {% if wrap.top_genre %}
+                        <div class="section">
+                            <div class="matching-artists">
+                                {% for artist in wrap.matching_artists %}
+                                    <div class="artist-card">
+                                        {% if artist.image_url %}
+                                            <img src="{{ artist.image_url }}" alt="{{ artist.name }}" style="width:80px; border-radius:10px; margin:10px;">
+                                        {% endif %}
+                                        <p>{{ artist.name }}</p>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <h4>{{ wrap.top_genre }}</h4>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Slide 7: Top Songs Playlist -->
+                <div class="story-slide">
+                    <h1>
+                        {% if language == 'es' %}Lista de Reproducción de Top 50
+                        {% elif language == 'bn' %}টপ ৫০ প্লেলিস্ট
+                        {% elif language == 'zh' %}前50首歌曲播放列表
+                        {% else %}Top 50 Tracks Playlist{% endif %}
+                    </h1>
+                    <div class="section">
+                        {% if wrap.top_tracks_images %}
+                            <div class="top-tracks-grid">
+                                {% for track in wrap.top_tracks_images %}
+                                    <div class="track-image-wrapper">
+                                        <img src="{{ track.image_url }}" alt="{{ track.name }}" class="track-image-playlist">
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p>Not enough data to display top tracks images.</p>
+                        {% endif %}
+                        <h2>{% if language == 'es' %}¡Hemos creado una lista de reproducción con tus 50 canciones favoritas!
+                            {% elif language == 'bn' %}আমরা তোমার সেরা ৫০টি গানের একটি প্লেলিস্ট তৈরি করেছি!
+                            {% elif language == 'zh' %}我们为你创建了一个包含你最喜欢的50首歌的播放列表！
+                            {% else %}We created a playlist of your top 50 songs!{% endif %}</h2>
+                        <a href="/create_top_tracks_playlist/" target="_blank">{% if language == 'es' %}Abrir en Spotify
+                            {% elif language == 'bn' %}স্পটিফাইতে খুলুন
+                            {% elif language == 'zh' %}在Spotify上打开
+                            {% else %}Open in Spotify{% endif %}</a>
+                    </div>
+                </div>
+
+                <!-- Slide 8: Spotify Wrapped Summary -->
+                <div class="story-slide" id="summary-container">
+                    <h1>{% if language == 'es' %}Tu Spotify Wrapped
+                        {% elif language == 'bn' %}তোমার স্পটিফাই র‍্যাপড
+                        {% elif language == 'zh' %}你的Spotify年度总结
+                        {% else %}Your Spotify Wrapped{% endif %}</h1>
+                    <!-- Top Artist's Image -->
+                    {% if wrap.top_artist_image_url %}
+                        <div class="top-artist-image">
+                            <img src="{{ wrap.top_artist_image_url }}" alt="{% if language == 'es' %}Artista Principal
+                            {% elif language == 'bn' %}শীর্ষ শিল্পী
+                            {% elif language == 'zh' %}最喜欢的艺术家
+                            {% else %}Top Artist{% endif %}" style="width:200px; border-radius:50%;">
+                        </div>
+                    {% endif %}
+
+                    <!-- Top 5 Artists and Top 5 Tracks side by side -->
+                    <div class="top-section">
+                        <div class="top-artists">
+                            <h3> {% if language == 'es' %}Artistas Principales
+                                {% elif language == 'bn' %}শীর্ষ শিল্পীরা
+                                {% elif language == 'zh' %}最喜欢的艺术家
+                                {% else %}Top Artists{% endif %}</h3>
+                            <ul>
+                                {% for artist in wrap.top_artists %}
+                                    <li>{{ forloop.counter }}&nbsp;&nbsp;&nbsp;{{ artist.name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+
+                        <div class="top-tracks">
+                            <h3>{% if language == 'es' %}Canciones Principales
+                                {% elif language == 'bn' %}শীর্ষ গানগুলি
+                                {% elif language == 'zh' %}最喜欢的歌曲
+                                {% else %}Top Tracks{% endif %}</h3>
+                            <ul>
+                                {% for track in wrap.top_tracks %}
+                                    <li>{{ forloop.counter }}&nbsp;&nbsp;&nbsp;{{ track.name }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="arrow right-arrow" onclick="nextModalSlide('{{ wrap.id }}')">&gt;</div>
+        </div>
+                        </div>
+
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="no-wraps">
+                    <p>No public wraps available yet.</p>
+                    {% if not is_authenticated %}
+                        <p>Login and be the first to share your Spotify Wrapped!</p>
+                        <a href="{% url 'users:spotify_login' %}" class="playlist-link">Login with Spotify</a>
+                    {% else %}
+                        <p>Be the first to share your Spotify Wrapped!</p>
+                        <a href="{% url 'users:spotify_wrapped' %}" class="playlist-link">Create My Wrap</a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        const modalSlides = {};
+        
+        /**
+         * Initializes the modal slides for the given wrap ID. This function sets up the
+         * current slide, slide elements, and tab elements for the modal.
+         *
+         * @param {string} wrapId - The ID of the wrap whose modal slides need to be initialized.
+         */
+        function initializeModalSlides(wrapId) {
+            if (!modalSlides[wrapId]) {
+                const modal = document.getElementById(`modal-${wrapId}`);
+                modalSlides[wrapId] = {
+                    currentSlide: 0,
+                    slides: modal.getElementsByClassName('story-slide'),
+                    tabs: modal.getElementsByClassName('tab')
+                };
+                updateModalSlide(wrapId);
+            }
+        }
+        
+        /**
+         * Updates the display of slides and tabs for the modal corresponding to the given wrap ID.
+         * Only the current slide is shown, and the active class is toggled on the current tab.
+         *
+         * @param {string} wrapId - The ID of the wrap whose modal slides need to be updated.
+         */
+        function updateModalSlide(wrapId) {
+            const slideInfo = modalSlides[wrapId];
+            const { slides, tabs, currentSlide } = slideInfo;
+
+            Array.from(slides).forEach((slide, index) => {
+                slide.style.display = index === currentSlide ? 'block' : 'none';
+                slide.classList.toggle('active', index === currentSlide);
+            });
+
+            Array.from(tabs).forEach((tab, index) => {
+                tab.classList.toggle('active', index === currentSlide);
+            });
+        }
+        
+        /**
+         * Advances to the next slide in the modal for the given wrap ID, if available.
+         *
+         * @param {string} wrapId - The ID of the wrap whose modal slide should advance.
+         */
+        function nextModalSlide(wrapId) {
+            const slideInfo = modalSlides[wrapId];
+            if (slideInfo.currentSlide < slideInfo.slides.length - 1) {
+                slideInfo.currentSlide++;
+                updateModalSlide(wrapId);
+            }
+        }
+        
+        /**
+         * Moves to the previous slide in the modal for the given wrap ID, if available.
+         *
+         * @param {string} wrapId - The ID of the wrap whose modal slide should go back.
+         */
+        function prevModalSlide(wrapId) {
+            const slideInfo = modalSlides[wrapId];
+            if (slideInfo.currentSlide > 0) {
+                slideInfo.currentSlide--;
+                updateModalSlide(wrapId);
+            }
+        }
+        
+        /**
+         * Navigates to a specific slide in the modal for the given wrap ID.
+         *
+         * @param {string} wrapId - The ID of the wrap whose modal slide should navigate.
+         * @param {number} index - The index of the slide to navigate to.
+         */
+        function goToModalSlide(wrapId, index) {
+            const slideInfo = modalSlides[wrapId];
+            slideInfo.currentSlide = index;
+            updateModalSlide(wrapId);
+        }
+        
+        /**
+     * Displays the modal for the given wrap ID and initializes its slides.
+     *
+     * @param {string} wrapId - The ID of the wrap whose modal should be displayed.
+     */
+        function showWrapDetails(wrapId) {
+            const modal = document.getElementById(`modal-${wrapId}`);
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+            initializeModalSlides(wrapId);
+        }
+        
+        /**
+         * Closes the modal for the given wrap ID and restores body scrolling.
+         *
+         * @param {string} wrapId - The ID of the wrap whose modal should be closed.
+         */
+        function closeModal(wrapId) {
+            const modal = document.getElementById(`modal-${wrapId}`);
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        /**
+         * Handles click events on the window.
+         * If the clicked element has the class 'modal', it hides the modal by setting its
+         * display style to 'none' and restores the page's scroll functionality by setting
+         * the body's overflow style to 'auto'.
+         *
+         * This is typically used to close modals when clicking outside their content.
+         *
+         * @param {MouseEvent} event - The click event triggered on the window.
+         */
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        /**
+         * Handles 'keydown' events on the document.
+         * Closes all open modals when the 'Escape' key is pressed by setting their
+         * display style to 'none' and restores the page's scroll functionality by
+         * setting the body's overflow style to 'auto'.
+         *
+         * This ensures a consistent and accessible way to close modals using the keyboard.
+         *
+         * @param {KeyboardEvent} event - The keydown event triggered on the document.
+         */
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const modals = document.getElementsByClassName('modal');
+                for (let modal of modals) {
+                    modal.style.display = 'none';
+                }
+                document.body.style.overflow = 'auto';
+            }
+        });
+         let currentLanguage = 'en';
+
+    const translations = {
+    en: {
+        header: 'Public Spotify Wraps',
+        wrapDate: 'Created by',
+        topArtist: 'Top Artist',
+        topTrack: 'Top Track',
+        topGenre: 'Top Genre',
+        themeButton: 'Change Theme',
+        navbar: {
+            home: 'Home',
+            profile: 'Profile',
+            myWrapped: 'My Wrapped',
+            publicWraps: 'Public Wraps',
+        },
+        modal: {
+            slideTopArtist: "Your Top Artist",
+            slideTopTrack: "Your Top Track",
+            slideTopGenre: "Your Top Genre",
+            slideTop50Playlist: "Top 50 Tracks Playlist",
+            slideSpotifyWrapped: "Your Spotify Wrapped",
+            slideGuessArtist: "Guess the Artist",
+            slideGuessSong: "Guess the Song",
+        },
+    },
+    es: {
+        header: 'Envoltorios públicos de Spotify',
+        wrapDate: 'Creado por',
+        topArtist: 'Artista Principal',
+        topTrack: 'Canción Principal',
+        topGenre: 'Género Principal',
+        themeButton: 'Cambiar Tema',
+        navbar: {
+            home: 'Inicio',
+            profile: 'Perfil',
+            myWrapped: 'Mi Wrapped',
+            publicWraps: 'Envoltorios Públicos',
+        },
+        modal: {
+            slideTopArtist: "Tu Artista Principal",
+            slideTopTrack: "Tu Canción Principal",
+            slideTopGenre: "Tu Género Principal",
+            slideTop50Playlist: "Lista de Reproducción de Top 50",
+            slideSpotifyWrapped: "Tu Spotify Wrapped",
+            slideGuessArtist: "Adivina el Artista",
+            slideGuessSong: "Adivina la Canción",
+        },
+    },
+    bn: {
+        header: 'পাবলিক স্পটিফাই র‍্যাপস',
+        wrapDate: 'তৈরি করেছেন',
+        topArtist: 'শীর্ষ শিল্পী',
+        topTrack: 'শীর্ষ গান',
+        topGenre: 'শীর্ষ ধরন',
+        themeButton: 'থিম পরিবর্তন করুন',
+        navbar: {
+            home: 'হোম',
+            profile: 'প্রোফাইল',
+            myWrapped: 'আমার র‍্যাপড',
+            publicWraps: 'পাবলিক র‍্যাপস',
+        },
+        modal: {
+            slideTopArtist: "তোমার শীর্ষ শিল্পী",
+            slideTopTrack: "তোমার শীর্ষ গান",
+            slideTopGenre: "তোমার শীর্ষ ধরন",
+            slideTop50Playlist: "শীর্ষ ৫০ প্লেলিস্ট",
+            slideSpotifyWrapped: "তোমার Spotify Wrapped",
+            slideGuessArtist: "গান অনুমান করুন",
+            slideGuessSong: "িল্পী অনুমান করুন",
+        },
+    },
+    zh: {
+        header: '公开的 Spotify 年终总结',
+        wrapDate: '由...创建',
+        topArtist: '最喜欢的艺术家',
+        topTrack: '最喜欢的歌曲',
+        topGenre: '最喜欢的音乐类型',
+        themeButton: '更改主题',
+        navbar: {
+            home: '主页',
+            profile: '个人资料',
+            myWrapped: '我的 Wrapped',
+            publicWraps: '公开的 Wrapped',
+        },
+        modal: {
+            slideTopArtist: "你最喜欢的艺术家",
+            slideTopTrack: "你最喜欢的歌曲",
+            slideTopGenre: "你最喜欢的音乐类型",
+            slideTop50Playlist: "前50首歌曲播放列表",
+            slideSpotifyWrapped: "你的 Spotify 年度总结",
+            slideGuessArtist: "猜猜艺术家",
+            slideGuessSong: "猜猜这首歌",
+        },
+    },
+};
+
+    /**
+     * Applies translations to various elements on the page based on the current language.
+     * Updates text content for:
+     * - The page header.
+     * - Wrap date elements, including creator and date attributes.
+     * - Card headings for top artist, track, and genre.
+     * - Navigation bar links.
+     * - Language toggle button text.
+     * - Theme toggle button text.
+     * 
+     * Behavior:
+     * - The function uses the `translations` object, which contains localized strings
+     *   for the interface in multiple languages.
+     * - It assumes a `currentLanguage` variable is available to determine the active language.
+     * - Certain dynamic elements like wrap dates use `data-creator` and `data-date` attributes.
+     */
+    function applyTranslations() {
+        const translation = translations[currentLanguage];
+
+        // Update header
+        document.querySelector('.page-header').textContent = translation.header;
+
+        // Translate wrap date
+        document.querySelectorAll('.wrap-date').forEach((wrapDate) => {
+            const creator = wrapDate.getAttribute('data-creator');
+            const date = wrapDate.getAttribute('data-date');
+            wrapDate.textContent = `${translation.wrapDate} ${creator} on ${date}`;
+        });
+
+        // Translate card headings
+        document.querySelectorAll('.top-artist').forEach((element) => {
+            element.textContent = translation.topArtist;
+        });
+        document.querySelectorAll('.top-track').forEach((element) => {
+            element.textContent = translation.topTrack;
+        });
+        document.querySelectorAll('.top-genre').forEach((element) => {
+            element.textContent = translation.topGenre;
+        });
+
+        // Translate navbar
+        document.querySelector('.nav-home').textContent = translation.navbar.home;
+        document.querySelector('.nav-profile').textContent = translation.navbar.profile;
+        document.querySelector('.nav-my-wrapped').textContent = translation.navbar.myWrapped;
+        document.querySelector('.nav-public-wraps').textContent = translation.navbar.publicWraps;
+
+        // Update language toggle text
+        document.querySelector('.lang-toggle').textContent =
+            currentLanguage === 'en' ? 'Español' :
+            currentLanguage === 'es' ? 'বাংলা' :
+            currentLanguage === 'bn' ? '中文' : 'English';
+        document.querySelector('.theme-toggle').textContent = translation.themeButton;
+
+        document.querySelectorAll('.modal').forEach((wrap) => {
+            const modalSlides = wrap.querySelectorAll('.story-slide');
+            modalSlides.forEach((slide, index) => {
+                const h1 = slide.querySelector('h1');
+                if (h1) {
+                    // Match each slide index and update with the corresponding translation
+                    switch (index) {
+                        case 0:
+                            h1.textContent = translation.modal.slideSpotifyWrapped || "Welcome to Your Spotify Wrapped!";
+                            break;
+                        case 1:
+                            h1.textContent = translation.modal.slideGuessArtist || "Guess the Artist";
+                            break;
+                        case 2:
+                            h1.textContent = translation.modal.slideTopArtist || "Your Top Artist";
+                            break;
+                        case 3:
+                            h1.textContent = translation.modal.slideGuessSong || "Guess the Song";
+                            break;
+                        case 4:
+                            h1.textContent = translation.modal.slideTopTrack || "Your Top Track";
+                            break;
+                        case 5:
+                            h1.textContent = translation.modal.slideTopGenre || "Your Top Genre";
+                            break;
+                        case 6:
+                            h1.textContent = translation.modal.slideTop50Playlist || "Top 50 Tracks Playlist";
+                            break;
+                        case 7:
+                            h1.textContent = translation.modal.slideSpotifyWrapped || "Your Spotify Wrapped";
+                            break;
+                    }
+                }
+            });
+        });
+    }
+
+    /**
+     * Cycles through supported languages and updates the page's translations.
+     * Supported languages:
+     * - English ('en')
+     * - Spanish ('es')
+     * - Bengali ('bn')
+     * - Chinese ('zh')
+     * 
+     * Behavior:
+     * - Updates the `currentLanguage` variable to the next language in the cycle.
+     * - Calls `applyTranslations` to update text content across the page.
+     * 
+     * Dependencies:
+     * - The `currentLanguage` variable tracks the current language state.
+     * - The `translations` object contains localized strings for the supported languages.
+     * - The page must have elements targeted by `applyTranslations` for text updates.
+     */
+    function toggleLanguage() {
+        // Cycle through languages: en -> es -> bn -> zh
+        if (currentLanguage === 'en') {
+            currentLanguage = 'es';
+        } else if (currentLanguage === 'es') {
+            currentLanguage = 'bn';
+        } else if (currentLanguage === 'bn') {
+            currentLanguage = 'zh';
+        } else {
+            currentLanguage = 'en';
+        }
+        applyTranslations();
+    }
+
+    document.addEventListener('DOMContentLoaded', applyTranslations);
+
+
+
+        let currentTheme = 'default';
+        
+        /**
+         * Toggles the page theme between default, dark, Halloween, and Christmas modes.
+         * Updates the body class based on the current theme.
+         */
+        const themes = [
+            { class: "default", name: "Change Theme" },
+            { class: "dark-mode", name: "Dark Mode" },
+            { class: "halloween-mode", name: "Halloween Theme" },
+            { class: "christmas-mode", name: "Christmas Theme" }
+        ];
+        let currentThemeIndex = 0;
+
+        const themeToggleBtn = document.querySelector(".theme-toggle");
+        const snowContainer = document.getElementById("snowContainer");
+        const ghostContainer = document.getElementById("ghostContainer");
+
+        themeToggleBtn.addEventListener("click", () => {
+            document.body.classList.remove(themes[currentThemeIndex].class);
+
+            // Update theme index
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+
+            // Apply new theme
+            const newTheme = themes[currentThemeIndex];
+            document.body.classList.add(newTheme.class);
+            themeToggleBtn.textContent = newTheme.name;
+
+            // Manage special effects
+            if (newTheme.class === "christmas-mode") {
+                generateSnowflakes();
+                clearGhosts();
+            } else if (newTheme.class === "halloween-mode") {
+                generateGhosts();
+                clearSnowflakes();
+            } else {
+                clearSnowflakes();
+                clearGhosts();
+            }
+        });
+
+        /**
+         * Generates and displays snowflake elements on the screen.
+         * Each snowflake is styled with random positioning, animation delay,
+         * and animation duration to create a natural falling effect.
+         * Clears any existing snowflakes before generating new ones.
+         *
+         * Behavior:
+         * - Creates 100 snowflake elements.
+         * - Appends them to the `snowContainer` element.
+         *
+         * Dependencies:
+         * - The `snowContainer` element must exist in the DOM.
+         */
+        function generateSnowflakes() {
+            clearSnowflakes();
+            const numberOfSnowflakes = 100;
+            for (let i = 0; i < numberOfSnowflakes; i++) {
+                const snowflake = document.createElement("div");
+                snowflake.classList.add("snowflake");
+                snowflake.style.left = Math.random() * 100 + "vw";
+                snowflake.style.animationDelay = Math.random() * 10 + "s";
+                snowflake.style.animationDuration = 5 + Math.random() * 5 + "s";
+                snowContainer.appendChild(snowflake);
+            }
+        }
+
+        /**
+         * Clears all snowflake elements from the screen.
+         *
+         * Behavior:
+         * - Empties the `snowContainer` element's contents.
+         *
+         * Dependencies:
+         * - The `snowContainer` element must exist in the DOM.
+         */
+        function clearSnowflakes() {
+            snowContainer.innerHTML = "";
+        }
+
+        /**
+         * Generates and displays ghost elements on the screen.
+         * Each ghost is styled with random positioning, animation delay, 
+         * and animation duration to create a floating effect.
+         * Clears any existing ghosts before generating new ones.
+         * 
+         * Behavior:
+         * - Creates 20 ghost elements.
+         * - Appends them to the `ghostContainer` element.
+         * 
+         * Dependencies:
+         * - The `ghostContainer` element must exist in the DOM.
+         */
+        function generateGhosts() {
+            clearGhosts();
+            const numberOfGhosts = 20;
+            for (let i = 0; i < numberOfGhosts; i++) {
+                const ghost = document.createElement("div");
+                ghost.classList.add("ghost");
+
+                const ghostTail = document.createElement("div");
+                ghostTail.classList.add("ghost-tail");
+                ghost.appendChild(ghostTail);
+
+                ghost.style.left = Math.random() * 100 + "vw";
+                ghost.style.animationDelay = Math.random() * 5 + "s";
+                ghost.style.animationDuration = 4 + Math.random() * 4 + "s";
+
+                ghostContainer.appendChild(ghost);
+            }
+        }
+
+        /**
+         * Clears all ghost elements from the screen.
+         *
+         * Behavior:
+         * - Empties the `ghostContainer` element's contents.
+         *
+         * Dependencies:
+         * - The `ghostContainer` element must exist in the DOM.
+         */
+        function clearGhosts() {
+            ghostContainer.innerHTML = "";
+        }
+        
+        
+
+    </script>
+</body>
+</html>

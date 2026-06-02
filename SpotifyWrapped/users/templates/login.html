@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Wrapped Login</title>
+    {% load static %}
+    <style>
+        body {
+            background: linear-gradient(45deg, #450af5, #c4efd9);
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            max-width: 90%;
+            width: 400px;
+            z-index: 1;
+        }
+
+        .logo {
+            width: 180px;
+            height: auto;
+            margin-bottom: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        #title {
+            color: white;
+            font-size: 2.5em;
+            margin: 20px 0;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .login-button {
+            background: #1DB954;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background 0.3s ease;
+            width: 80%;
+            max-width: 300px;
+            margin-top: 20px;
+        }
+
+        .login-button:hover {
+            transform: scale(1.05);
+            background: #1ed760;
+        }
+
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: floatShape 20s infinite linear;
+        }
+
+        @keyframes floatShape {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            100% {
+                transform: translate(var(--moveX), var(--moveY)) rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .background-shapes {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 20px;
+            }
+
+            #title {
+                font-size: 2em;
+            }
+
+            .logo {
+                width: 150px;
+            }
+
+            .login-button {
+                font-size: 1em;
+                padding: 12px 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background-shapes" id="backgroundShapes"></div>
+    
+    <div class="login-container">
+        <img src="{% static 'images/Spotify_logo.png' %}" alt="Spotify Logo" class="logo">
+        <div id="title">Spotify Wrapped</div>
+        <a href="{% url 'users:spotify_login' %}">
+            <button class="login-button">Login with Spotify</button>
+        </a>
+    </div>
+
+    <script>
+        function createBackgroundShapes() {
+            const shapes = document.getElementById('backgroundShapes');
+            const numShapes = 15;
+
+            for (let i = 0; i < numShapes; i++) {
+                const shape = document.createElement('div');
+                shape.className = 'shape';
+
+                const size = Math.random() * 200 + 50;
+                const moveX = Math.random() * window.innerWidth;
+                const moveY = Math.random() * window.innerHeight;
+
+                shape.style.width = `${size}px`;
+                shape.style.height = `${size}px`;
+                shape.style.left = `${Math.random() * 100}%`;
+                shape.style.top = `${Math.random() * 100}%`;
+                shape.style.setProperty('--moveX', `${moveX}px`);
+                shape.style.setProperty('--moveY', `${moveY}px`);
+                shape.style.animationDelay = `${Math.random() * 20}s`;
+
+                shapes.appendChild(shape);
+            }
+        }
+
+        createBackgroundShapes();
+    </script>
+</body>
+</html>

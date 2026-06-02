@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>Logging Out...</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #121212;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+
+        .logout-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 40px;
+            max-width: 400px;
+        }
+
+        h1 {
+            color: #1DB954;
+            margin-bottom: 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(29, 185, 84, 0.1);
+            border-left-color: #1DB954;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .message {
+            color: #b3b3b3;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="logout-container">
+        <h1>Logging Out</h1>
+        <div class="spinner"></div>
+        <p class="message">Please wait while we sign you out...</p>
+    </div>
+
+    <script>
+        /**
+         * Logs out the user by clearing local storage, session storage, and cookies, 
+         * then redirects to Spotify's logout page and finally back to the home page.
+         * 
+         * @function
+         */
+        function logout() {
+            // Clear all storage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            // Clear cookies
+            document.cookie.split(";").forEach(function(c) {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
+            
+            // Redirect to Spotify logout first
+            window.location.href = "https://accounts.spotify.com/logout";
+            
+            // Then redirect back to home page after a delay
+            setTimeout(function() {
+                window.location.href = "{{ home_url }}";
+            }, 1000);
+        }
+
+        // Start logout process when page loads
+        document.addEventListener('DOMContentLoaded', logout);
+    </script>
+</body>
+</html>

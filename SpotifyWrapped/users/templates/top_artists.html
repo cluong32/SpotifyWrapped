@@ -1,0 +1,288 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Artists</title>
+    <link rel="stylesheet" href="{% static 'css/top_artists.css' %}">
+</head>
+<body>
+    <div class="background-shapes" id="backgroundShapes"></div>
+    <div class="snow-container" id="snowContainer"></div>
+            <div class="ghost-container" id="ghostContainer"></div>
+    <h1 id="pageTitle">Your Top Artists</h1>
+    <ul>
+        {% for artist in artists %}
+        <li>
+            <img src="{{ artist.image_url }}" alt="{{ artist.name }}">
+            <strong>{{ forloop.counter }}. {{ artist.name }}</strong>
+        </li>
+        {% endfor %}
+    </ul>
+
+    <a href="/home/" class="back-button" id="backButton">Back to Home</a>
+    <button class="theme-toggle" id="themeToggle">Switch to Dark Mode</button>
+    <button class="theme-toggle" id="langToggle">Switch to Español</button>
+    <script>
+       const langData = {
+            en: {
+                pageTitle: "Your Top Artists",
+                backButton: "Back to Home",
+                themeToggle: {
+                    light: "Switch to Dark Mode",
+                    dark: "Switch to Halloween Mode",
+                    halloween: "Switch to Christmas Mode",
+                    christmas: "Switch to Light Mode"
+                },
+                langToggle: "Switch to Español"
+            },
+            es: {
+                pageTitle: "Tus Mejores Artistas",
+                backButton: "Volver al Inicio",
+                themeToggle: {
+                    light: "Cambiar a Modo Oscuro",
+                    dark: "Cambiar a Modo Halloween",
+                    halloween: "Cambiar a Modo Navidad",
+                    christmas: "Cambiar a Modo Claro"
+                },
+                langToggle: "Switch to বাংলা"
+            },
+            bn: {
+                pageTitle: "আপনার শীর্ষ শিল্পী",
+                backButton: "হোমে ফিরে যান",
+                themeToggle: {
+                    light: "ডার্ক মোডে যান",
+                    dark: "হ্যালোইন মোডে যান",
+                    halloween: "ক্রিসমাস মোডে যান",
+                    christmas: "লাইট মোডে যান"
+                },
+                langToggle: "切换到中文"
+            },
+            zh: {
+                pageTitle: "您的顶级艺术家",
+                backButton: "返回首页",
+                themeToggle: {
+                    light: "切换到深色模式",
+                    dark: "切换到万圣节模式",
+                    halloween: "切换到圣诞节模式",
+                    christmas: "切换到浅色模式"
+                },
+                langToggle: "Switch to English"
+            }
+        };
+
+        let currentLang = 'en';
+        let currentTheme = 'light';
+
+        /**
+         * Updates the UI elements on the page to reflect the currently selected language.
+         * It dynamically changes text content for headings, buttons, and other elements based on the language data.
+         *
+         * @function updateLanguage
+         * @param {Object} languages - Object containing language-specific text data.
+         * @param {string} currentLanguage - The currently selected language code.
+         * @global
+         */
+        function updateLanguage() {
+            const langContent = langData[currentLang];
+            document.getElementById('pageTitle').textContent = langContent.pageTitle;
+            document.getElementById('backButton').textContent = langContent.backButton;
+            document.getElementById('langToggle').textContent = langContent.langToggle;
+            // Update theme toggle button text based on current theme
+            document.getElementById('themeToggle').textContent = langContent.themeToggle[currentTheme];
+        }
+
+        const langToggleButton = document.getElementById('langToggle');
+        langToggleButton.addEventListener('click', () => {
+            currentLang = currentLang === 'en' ? 'es' : 
+                         currentLang === 'es' ? 'bn' : 
+                         currentLang === 'bn' ? 'zh' : 'en';
+            updateLanguage();
+        });
+
+        const toggleButton = document.getElementById('themeToggle');
+        const body = document.body;
+
+        toggleButton.addEventListener('click', () => {
+            // Remove all theme classes
+            body.classList.remove('dark-mode', 'halloween-mode', 'christmas-mode');
+
+            // Cycle through the themes
+            if (currentTheme === 'light') {
+                body.classList.add('dark-mode');
+                currentTheme = 'dark';
+            } else if (currentTheme === 'dark') {
+                body.classList.add('halloween-mode');
+                currentTheme = 'halloween';
+            } else if (currentTheme === 'halloween') {
+                body.classList.add('christmas-mode');
+                currentTheme = 'christmas';
+            } else {
+                currentTheme = 'light';
+            }
+            
+            // Update the button text in the current language
+            toggleButton.textContent = langData[currentLang].themeToggle[currentTheme];
+        });
+const themes = [
+    { class: "light", name: "Change Theme" },
+    { class: "dark-mode", name: "Dark Mode" },
+    { class: "halloween-mode", name: "Halloween Mode" },
+    { class: "christmas-mode", name: "Christmas Mode" }
+];
+
+let currentThemeIndex = 0;
+
+const themeToggleBtn = document.getElementById("themeToggle");
+const snowContainer = document.getElementById("snowContainer");
+const ghostContainer = document.getElementById("ghostContainer");
+
+themeToggleBtn.addEventListener("click", () => {
+    // Remove all previous theme classes
+    document.body.classList.remove(
+        "light",
+        "dark-mode",
+        "halloween-mode",
+        "christmas-mode"
+    );
+
+    // Update to the next theme
+    currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+    const newTheme = themes[currentThemeIndex];
+    document.body.classList.add(newTheme.class);
+
+    // Update the button text
+    themeToggleBtn.textContent = newTheme.name;
+
+    // Manage special effects
+    if (newTheme.class === "christmas-mode") {
+        generateSnowflakes();
+        clearGhosts();
+    } else if (newTheme.class === "halloween-mode") {
+        generateGhosts();
+        clearSnowflakes();
+    } else {
+        clearSnowflakes();
+        clearGhosts();
+    }
+});
+
+/**
+ * Generates and displays snowflake elements on the screen.
+ * Each snowflake is styled with random positioning, animation delay,
+ * and animation duration to create a natural falling effect.
+ * Clears any existing snowflakes before generating new ones.
+ *
+ * Behavior:
+ * - Creates 100 snowflake elements.
+ * - Appends them to the `snowContainer` element.
+ *
+ * Dependencies:
+ * - The `snowContainer` element must exist in the DOM.
+ */
+function generateSnowflakes() {
+    clearSnowflakes();
+    const numberOfSnowflakes = 100;
+    for (let i = 0; i < numberOfSnowflakes; i++) {
+        const snowflake = document.createElement("div");
+        snowflake.classList.add("snowflake");
+        snowflake.style.left = Math.random() * 100 + "vw";
+        snowflake.style.animationDelay = Math.random() * 10 + "s";
+        snowflake.style.animationDuration = 5 + Math.random() * 5 + "s";
+        snowContainer.appendChild(snowflake);
+    }
+}
+
+/**
+ * Clears all snowflake elements from the screen.
+ * 
+ * Behavior:
+ * - Empties the `snowContainer` element's contents.
+ * 
+ * Dependencies:
+ * - The `snowContainer` element must exist in the DOM.
+ */
+function clearSnowflakes() {
+    snowContainer.innerHTML = "";
+}
+
+/**
+ * Generates and displays ghost elements on the screen.
+ * Each ghost is styled with random positioning, animation delay, 
+ * and animation duration to create a floating effect.
+ * Clears any existing ghosts before generating new ones.
+ * 
+ * Behavior:
+ * - Creates 20 ghost elements.
+ * - Appends them to the `ghostContainer` element.
+ * 
+ * Dependencies:
+ * - The `ghostContainer` element must exist in the DOM.
+ */
+function generateGhosts() {
+    clearGhosts();
+    const numberOfGhosts = 20;
+    for (let i = 0; i < numberOfGhosts; i++) {
+        const ghost = document.createElement("div");
+        ghost.classList.add("ghost");
+
+        ghost.style.left = Math.random() * 100 + "vw";
+        ghost.style.animationDelay = Math.random() * 5 + "s";
+        ghost.style.animationDuration = 4 + Math.random() * 4 + "s";
+
+        ghostContainer.appendChild(ghost);
+    }
+}
+
+/**
+ * Clears all ghost elements from the screen.
+ * 
+ * Behavior:
+ * - Empties the `ghostContainer` element's contents.
+ * 
+ * Dependencies:
+ * - The `ghostContainer` element must exist in the DOM.
+ */
+function clearGhosts() {
+    ghostContainer.innerHTML = "";
+}
+
+        /**
+         * Dynamically generates decorative shapes in the background of the page.
+         * The shapes are randomly sized, positioned, and animated, providing a visually engaging effect.
+         *
+         * @function createBackgroundShapes
+         * @param {number} [numShapes=15] - The number of shapes to create (default is 15).
+         * @global
+         */
+        function createBackgroundShapes() {
+            const shapes = document.getElementById('backgroundShapes');
+            const numShapes = 15;
+
+            for (let i = 0; i < numShapes; i++) {
+                const shape = document.createElement('div');
+                shape.className = 'shape';
+
+                const size = Math.random() * 200 + 50;
+                const moveX = Math.random() * window.innerWidth;
+                const moveY = Math.random() * window.innerHeight;
+
+                shape.style.width = `${size}px`;
+                shape.style.height = `${size}px`;
+                shape.style.left = `${Math.random() * 100}%`;
+                shape.style.top = `${Math.random() * 100}%`;
+                shape.style.setProperty('--moveX', `${moveX}px`);
+                shape.style.setProperty('--moveY', `${moveY}px`);
+                shape.style.animationDelay = `${Math.random() * 20}s`;
+
+                shapes.appendChild(shape);
+            }
+        }
+
+        // Initialize background shapes and language
+        createBackgroundShapes();
+        updateLanguage();
+    </script>
+</body>
+</html>

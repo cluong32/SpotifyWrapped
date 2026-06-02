@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Your Spotify Wrapped</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/wrapped_slides.css' %}">
+        <script src="https://sdk.scdn.co/spotify-player.js"></script>
+       
+    </head>
+    <body>
+        {% csrf_token %}
+        <div class="nav-bar">
+            <a href="{% url 'users:home' %}">
+                {% if language == 'es' %}Inicio
+                {% elif language == 'bn' %}হোম
+                {% elif language == 'zh' %}主页
+                {% else %}Home{% endif %}
+            </a>
+            <a href="{% url 'users:profile' %}">
+                {% if language == 'es' %}Perfil
+                {% elif language == 'bn' %}প্রোফাইল
+                {% elif language == 'zh' %}个人资料
+                {% else %}Profile{% endif %}
+            </a>
+            <a href="{% url 'users:spotify_wrapped' %}">
+                {% if language == 'es' %}Mi Wrapped
+                {% elif language == 'bn' %}আমার র‍্যাপড
+                {% elif language == 'zh' %}我的年度总结
+                {% else %}My Wrapped{% endif %}
+            </a>
+            <a href="{% url 'users:public_wraps' %}">
+                {% if language == 'es' %}Wraps Públicos
+                {% elif language == 'bn' %}পাবলিক র‍্যাপস
+                {% elif language == 'zh' %}公共总结
+                {% else %}Public Wraps{% endif %}
+            </a>
+            <button class="lang-toggle" onclick="toggleLanguage()">
+                {% if language == 'es' %}Switch to Bengali
+                {% elif language == 'bn' %}切换到中文
+                {% elif language == 'zh' %}Switch to English
+                {% else %}Cambiar a Español{% endif %}
+            </button>
+             <button class="theme-toggle" onclick="toggleTheme()">
+                {% if language == 'es' %}Cambiar tema
+                {% elif language == 'bn' %}থিম পরিবর্তন করুন
+                {% elif language == 'zh' %}切换主题
+                {% else %}Change Theme{% endif %}
+             </button>
+        </div>
+
+        <div class="wrapper">
+            <div class="story-tabs">
+                <div class="tab active" onclick="goToSlide(0)"></div>
+                <div class="tab" onclick="goToSlide(1)"></div>
+                <div class="tab" onclick="goToSlide(2)"></div>
+                <div class="tab" onclick="goToSlide(3)"></div>
+                <div class="tab" onclick="goToSlide(4)"></div>
+                <div class="tab" onclick="goToSlide(5)"></div>
+                <div class="tab" onclick="goToSlide(6)"></div>
+                <div class="tab" onclick="goToSlide(7)"></div>
+            </div>
+
+            <div class="stories">
+                <div class="arrow left-arrow" onclick="prevSlide()">&lt;</div>
+
+                <div class="slide-content">
+                    <!-- Slide 1: Welcome to Spotify Wrapped -->
+                    <div class="story-slide acitve">
+                        <div class="section">
+                            <img src="{% static 'images/Spotify_logo.png' %}" alt="Spotify logo" class="logo">
+                            <h1> {% if language == 'es' %}¡Bienvenido a Tu Spotify Wrapped!
+                                {% elif language == 'bn' %}তোমার স্পটিফাই র‍্যাপডে স্বাগতম!
+                                {% elif language == 'zh' %}欢迎来到你的Spotify年度总结！
+                                {% else %}Welcome to Your Spotify Wrapped!{% endif %}</h1>
+                        </div>
+                    </div>
+
+                    <!-- Slide 2: Guess Top Artist -->
+                    <div class="story-slide">
+
+                        <h1> {% if language == 'es' %}Adivina el Artista
+                            {% elif language == 'bn' %}শিল্পী অনুমান করুন
+                            {% elif language == 'zh' %}猜猜艺术家
+                            {% else %}Guess the Artist{% endif %}</h1>
+                        <div class="section">
+                            {% if user_data.top_artist %}
+                                <!-- Display the genres of the top artist -->
+                                <p><strong>  {% if language == 'es' %}El género de tu artista principal:
+                                    {% elif language == 'bn' %}তোমার শীর্ষ শিল্পীর ধরন:
+                                    {% elif language == 'zh' %}你最喜欢的艺术家的类型：
+                                    {% else %}Your Top Artist's Genre:{% endif %}</strong>
+                                    <div class="guess-artist-genre">
+                                        {{ user_data.top_genre }}
+                                    </div>
+                                </p>
+
+                                <!-- Buttons for guessing the artist -->
+                                <p>{% if language == 'es' %}¡Adivina quién es tu artista principal!
+                                    {% elif language == 'bn' %}তোমার শীর্ষ শিল্পী কে অনুমান কর!
+                                    {% elif language == 'zh' %}猜猜你的最喜欢的艺术家是谁！
+                                    {% else %}Guess who your top artist is!{% endif %}</p>
+                                <ul>
+                                    {% for choice in user_data.top_3_artists %}
+                                        <li>
+                                            <button class="guess-button" onclick="checkAnswerArtist('{{ choice.name }}', '{{ user_data.top_artist.name }}')">
+                                                {{ choice.name }}
+                                            </button>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                <p id="resultArtist"></p>
+                            {% else %}
+                                <p>Unable to fetch artist information. Please try again later.</p>
+                            {% endif %}
+
+                        </div>
+                    </div>
+
+                    <!-- Slide 3: Top Artist -->
+                    <div class="story-slide">
+                        <h1>
+                            {% if language == 'es' %}Tu Artista Principal
+                            {% elif language == 'bn' %}তোমার শীর্ষ শিল্পী
+                            {% elif language == 'zh' %}你最喜欢的艺术家
+                            {% else %}Your Top Artist{% endif %}
+                        </h1>
+                        {% if user_data.top_artist %}
+                            <div class="section">
+                                <img class="artist-image" src="{{ user_data.top_artist.image_url }}" alt="{{ user_data.top_artist.name }}">
+                                <h2>{{ user_data.top_artist.name }}</h2>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Slide 4: Guess Top Track -->
+                    <div class="story-slide">
+                        <h2>{% if language == 'es' %}Adivina la Canción
+                            {% elif language == 'bn' %}গান অনুমান করুন
+                            {% elif language == 'zh' %}猜猜这首歌
+                            {% else %}Guess the Song{% endif %}</h2>
+                        <div class="section">
+                            {% if user_data.top_track.name %}
+                                <button class="guess-button" onclick="playSnippet()"> Play</button>
+                                <p> {% if language == 'es' %}¡Adivina una de tus mejores canciones con este fragmento!
+                                    {% elif language == 'bn' %}এই অংশ থেকে তোমার শীর্ষ গান অনুমান করুন!
+                                    {% elif language == 'zh' %}从这段片段中猜出你最喜欢的歌曲！
+                                    {% else %}Guess one of your top tracks from this snippet!{% endif %}</p>
+                                <ul>
+                                    {% for choice in user_data.top_3_tracks %}
+                                        <li>
+                                            <button class="guess-button" onclick="checkAnswer('{{ choice.name }}', '{{ user_data.guess_song_game.name }}')">
+                                                {{ choice.name }}
+                                            </button>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                <p id="result"></p>
+                            {% else %}
+                                <p>Unable to fetch a song snippet. Please try again later.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Slide 5: Top Track -->
+                    <div class="story-slide">
+                        <h1>
+                            {% if language == 'es' %}Tu Canción Principal
+                            {% elif language == 'bn' %}তোমার শীর্ষ গান
+                            {% elif language == 'zh' %}你最喜欢的歌曲
+                            {% else %}Your Top Track{% endif %}
+                        </h1>
+                        {% if user_data.top_track %}
+                            <div class="section">
+                                <img class="track-image" src="{{ user_data.top_track.image_url }}" alt="{{ user_data.top_track.name }}">
+                                <h2>{{ user_data.top_track.name }}</h2>
+                                <!-- Play Button -->
+                                <button id='playTopTrack' onclick="playTopTrack()">{% if language == 'es' %}Reproducir Canción Principal
+                                    {% elif language == 'bn' %}শীর্ষ গান চালান
+                                    {% elif language == 'zh' %}播放最喜欢的歌曲
+                                    {% else %}Play Top Track{% endif %}</button>
+                                <button id='pauseTrack' onclick="pauseTrack()">{% if language == 'es' %}Pausa
+                                    {% elif language == 'bn' %}বিরতি
+                                    {% elif language == 'zh' %}暂停
+                                    {% else %}Pause{% endif %} </button>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Slide 6: Top Genre -->
+                    <div class="story-slide">
+                        <h1>{% if language == 'es' %}Tu Género Principal
+                            {% elif language == 'bn' %}তোমার শীর্ষ ধরন
+                            {% elif language == 'zh' %}你最喜欢的音乐类型
+                            {% else %}Your Top Genre{% endif %}</h1>
+
+                        {% if user_data.top_genre %}
+                            <div class="section">
+                                <div class="matching-artists">
+                                    {% for artist in user_data.matching_artists %}
+                                        <div class="artist-card">
+                                            {% if artist.image_url %}
+                                                <img src="{{ artist.image_url }}" alt="{{ artist.name }}" style="width:80px; border-radius:10px; margin:10px;">
+                                            {% endif %}
+                                            <p>{{ artist.name }}</p>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                                <h3>{{ user_data.top_genre }}</h3>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Slide 7: Top Artists List -->
+                    <div class="story-slide">
+                        <h1>
+                            {% if language == 'es' %}Lista de Reproducción de Top 50
+                            {% elif language == 'bn' %}টপ ৫০ প্লেলিস্ট
+                            {% elif language == 'zh' %}前50首歌曲播放列表
+                            {% else %}Top 50 Tracks Playlist{% endif %}
+                        </h1>
+                        <div class="section">
+                            {% if user_data.top_tracks_images %}
+                                <div class="top-tracks-grid">
+                                    {% for track in user_data.top_tracks_images %}
+                                        <div class="track-image-wrapper">
+                                            <img src="{{ track.image_url }}" alt="{{ track.name }}" class="track-image-playlist">
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <p>Not enough data to display top tracks images.</p>
+                            {% endif %}
+
+                            <h2>{% if language == 'es' %}¡Hemos creado una lista de reproducción con tus 50 canciones favoritas!
+                                {% elif language == 'bn' %}আমরা তোমার সেরা ৫০টি গানের একটি প্লেলিস্ট তৈরি করেছি!
+                                {% elif language == 'zh' %}我们为你创建了一个包含你最喜欢的50首歌的播放列表！
+                                {% else %}We created a playlist of your top 50 songs!{% endif %}</h2>
+                            <a href="/create_top_tracks_playlist/" target="_blank">{% if language == 'es' %}Abrir en Spotify
+                                {% elif language == 'bn' %}স্পটিফাইতে খুলুন
+                                {% elif language == 'zh' %}在Spotify上打开
+                                {% else %}Open in Spotify{% endif %}</a>
+                        </div>
+                    </div>
+
+                    <!-- Slide 8: Spotify Wrapped Summary -->
+                    <div class="story-slide" id="summary-container">
+                        <h1>{% if language == 'es' %}Tu Spotify Wrapped
+                            {% elif language == 'bn' %}তোমার স্পটিফাই র‍্যাপড
+                            {% elif language == 'zh' %}你的Spotify年度总结
+                            {% else %}Your Spotify Wrapped{% endif %}</h1>
+                        <!-- Top Artist's Image -->
+                        {% if user_data.top_artist.image_url %}
+                            <div class="top-artist-image">
+                                <img src="{{ user_data.top_artist.image_url }}" alt="{% if language == 'es' %}Artista Principal
+                                {% elif language == 'bn' %}শীর্ষ শিল্পী
+                                {% elif language == 'zh' %}最喜欢的艺术家
+                                {% else %}Top Artist{% endif %}" style="width:200px; border-radius:50%;">
+                            </div>
+                        {% endif %}
+
+                        <!-- Top 5 Artists and Top 5 Tracks side by side -->
+                        <div class="top-section">
+                            <div class="top-artists">
+                                <h2> {% if language == 'es' %}Artistas Principales
+                                    {% elif language == 'bn' %}শীর্ষ শিল্পীরা
+                                    {% elif language == 'zh' %}最喜欢的艺术家
+                                    {% else %}Top Artists{% endif %}</h2>
+                                <ul>
+                                    {% for artist in user_data.top_artists %}
+                                        <li>{{ forloop.counter }}&nbsp;&nbsp;&nbsp;{{ artist.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                            <div class="top-tracks">
+                                <h2>{% if language == 'es' %}Canciones Principales
+                                    {% elif language == 'bn' %}শীর্ষ গানগুলি
+                                    {% elif language == 'zh' %}最喜欢的歌曲
+                                    {% else %}Top Tracks{% endif %}</h2>
+                                <ul>
+                                    {% for track in user_data.top_tracks %}
+                                        <li>{{ forloop.counter }}&nbsp;&nbsp;&nbsp;{{ track.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <form id="saveWrapForm" method="post" action="{% url 'users:save_wrap' %}">
+                            {% csrf_token %}
+                            <button id="saveWrapButton" type="button" class="save-wrap-button" onclick="saveWrap()">
+                                {% if language == 'es' %}Guardar Wrap 🎵
+                                {% elif language == 'bn' %}র‍্যাপ সংরক্ষণ করুন 🎵
+                                {% elif language == 'zh' %}保存年度总结 🎵
+                                {% else %}Save Wrap 🎵{% endif %}
+                            </button>
+                        </form>
+
+                        <div id="saveSuccess" class="save-success">
+                            {% if language == 'es' %}¡Tu Wrap ha sido guardado! 🎵
+                            {% elif language == 'bn' %}তোমার র‍্যাপ সংরক্ষিত হয়েছে! 🎵
+                            {% elif language == 'zh' %}你的年度总结已保存！🎵
+                            {% else %}Your Wrap has been saved! 🎵{% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="arrow right-arrow" onclick="nextSlide()">&gt;</div>
+            </div>
+        </div>
+
+        <div id="snow-container"></div>
+        <div id="green-bubble-container"></div>
+    </body>
+    
+</html>
+<script>
+ let currentSlide = 0;
+const slides = document.querySelectorAll('.story-slide');
+const tabs = document.querySelectorAll('.tab');
+const playPauseButton = document.getElementById('playPauseButton');
+const slideDuration = 5000; // 5 seconds per slide
+let player;
+let isTrackPlaying = false;
+const trackUri = '{{ user_data.top_track.uri }}';  // URI of the track to play
+const accessToken = '{{ request.session.access_token }}';  // Spotify access token
+let device_id;
+
+/**
+* Toggles the current theme of the application through a predefined set of themes.
+* Themes cycle in the following order: 'light', 'dark', 'halloween', 'christmas'.
+* When the 'christmas' theme is applied, a snow effect is enabled.
+*/
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const themeOrder = ['light', 'dark', 'halloween', 'christmas'];
+    const currentIndex = themeOrder.indexOf(currentTheme);
+    const nextTheme = themeOrder[(currentIndex + 1) % themeOrder.length];
+
+    document.documentElement.setAttribute('data-theme', nextTheme);
+
+    /**
+     * Creates a snow effect by adding multiple falling dots to the 'snow-container' element.
+     * Each snow dot has randomized position, size, fall speed, and animation delay for a natural effect.
+     */
+    function createSnowDots() {
+        const snowContainer = document.getElementById("snow-container");
+
+        for (let i = 0; i < 50; i++) {
+            const snowDot = document.createElement("div");
+            snowDot.classList.add("snow-dot");
+
+            snowDot.style.left = `${Math.random() * 100}%`;  // Random horizontal position
+            snowDot.style.animationDuration = `${Math.random() * 3 + 7}s`; // Random fall speed
+            snowDot.style.animationDelay = `${Math.random() * 5}s`; // Random start delay
+            snowDot.style.width = `${Math.random() * 4 + 6}px`; // Random size for the dots
+            snowDot.style.height = snowDot.style.width; // Keep the height the same as width for round dots
+
+            snowContainer.appendChild(snowDot);
+        }
+    }
+
+    /**
+     * Removes the snow effect by clearing all child elements from the 'snow-container' element.
+     */
+    function removeSnowDots() {
+        const snowContainer = document.getElementById("snow-container");
+        snowContainer.innerHTML = '';  // Clear all snow dots
+    }
+
+    /**
+     * Enables or disables the snow effect based on the current theme.
+     * If the 'christmas' theme is active, snow dots are created.
+     * If any other theme is active, the snow dots are removed.
+     */
+    function enableSnowOnChristmas() {
+        if (document.documentElement.getAttribute('data-theme') === 'christmas') {
+            createSnowDots();
+        } else {
+            removeSnowDots();
+        }
+    }
+    enableSnowOnChristmas();
+
+    /**
+     * Creates green floating bubbles for a visual effect, adding them to a container.
+     * If the container does not exist, it is dynamically created.
+     */
+    function createGreenBubbles() {
+        const bubbleContainer = document.getElementById('green-bubble-container');
+        const numBubbles = 20; // Number of bubbles
+
+        // Ensure the container is there
+        if (!bubbleContainer) {
+            // Create the container if it doesn't exist
+            const newBubbleContainer = document.createElement('div');
+            newBubbleContainer.id = 'green-bubble-container';
+            document.body.appendChild(newBubbleContainer);
+        }
+
+        // Create bubbles inside the container
+        for (let i = 0; i < numBubbles; i++) {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+
+            // Random properties
+            const size = Math.random() * 50 + 20; // Size between 20px and 70px
+            const startX = Math.random() * window.innerWidth;
+            const delay = Math.random() * 4; // Delay up to 4 seconds
+            const duration = Math.random() * 3 + 5; // Duration between 5-8 seconds
+
+            bubble.style.width = `${size}px`;
+            bubble.style.height = `${size}px`;
+            bubble.style.left = `${startX}px`;
+            bubble.style.animationDuration = `${duration}s`;
+            bubble.style.animationDelay = `${delay}s`;
+
+            bubbleContainer.appendChild(bubble);
+        }
+    }
+
+    /**
+     * Removes all green bubbles from the container.
+     */
+    function removeGreenBubbles() {
+        const bubbleContainer = document.getElementById("green-bubble-container");
+        if (bubbleContainer) {
+            bubbleContainer.innerHTML = ''; // Clear all bubbles
+        }
+    }
+
+    /**
+     * Enables or disables green bubbles based on the current theme.
+     * If the 'halloween' theme is active, bubbles are created; otherwise, they are removed.
+     */
+    function enableGreenBubblesOnHalloween() {
+        // Check if the current theme is halloween
+        if (document.documentElement.getAttribute('data-theme') === 'halloween') {
+            createGreenBubbles();
+        } else {
+            removeGreenBubbles();
+        }
+    }
+
+    // Enable or remove based on the theme when the page loads
+    enableGreenBubblesOnHalloween();
+
+    // Event listener to handle theme changes
+    document.documentElement.addEventListener('theme-change', enableGreenBubblesOnHalloween);
+
+
+    // Check theme change and apply snow effect
+    document.documentElement.addEventListener('theme-change', enableSnowOnChristmas);
+
+
+
+
+    // Update button text based on next theme in cycle
+    const themeButton = document.querySelector('.theme-toggle');
+    if (themeButton) {
+        const language = '{{ language|default:"en" }}';
+        const nextThemeIndex = (currentIndex + 2) % themeOrder.length;
+
+        const themeNames = {
+            'light': {
+                'en': 'Light Mode',
+                'es': 'Modo Claro',
+                'bn': 'লাইট মোড',
+                'zh': '明亮模式'
+            },
+            'dark': {
+                'en': 'Dark Mode',
+                'es': 'Modo Oscuro',
+                'bn': 'ডার্ক মোড',
+                'zh': '深色模式'
+            },
+            'halloween': {
+                'en': 'Halloween',
+                'es': 'Halloween',
+                'bn': 'হ্যালোউইন',
+                'zh': '万圣节'
+            },
+            'christmas': {
+                'en': 'Christmas',
+                'es': 'Navidad',
+                'bn': 'ক্রিসমাস',
+                'zh': '圣诞节'
+            }
+        };
+
+        themeButton.textContent = `${themeNames[themeOrder[nextThemeIndex]][language]}`;
+    }
+
+    localStorage.setItem('preferred-theme', nextTheme);
+}
+window.onSpotifyWebPlaybackSDKReady = () => {
+    player = new Spotify.Player({
+        name: 'Your Spotify Wrapped Player',
+        getOAuthToken: cb => { cb(accessToken); },
+        volume: 0.5
+    });
+
+    // Ready event
+    player.addListener('ready', ({ device_id }) => {
+        console.log('Ready with Device ID', device_id);
+        deviceId = device_id;  // Save device ID for later use
+    });
+
+    // Error handling
+    player.addListener('initialization_error', ({ message }) => { console.error(message); });
+    player.addListener('authentication_error', ({ message }) => { console.error(message); });
+    player.addListener('account_error', ({ message }) => { console.error(message); });
+    player.addListener('playback_error', ({ message }) => { console.error(message); });
+
+    player.addListener('player_state_changed', state => {
+        const isPlaying = !state.paused;
+        updateButtonVisibility(isPlaying);
+    })
+    // Connect to the player
+    player.connect();
+};
+
+/**
+ * Updates the slide display by toggling active states and hiding/showing slides and buttons.
+ */
+function updateSlide() {
+    slides.forEach((slide, index) => {
+        slide.style.display = index === currentSlide ? 'block' : 'none';
+        slide.classList.toggle('active', index === currentSlide);
+    });
+
+    tabs.forEach((tab, index) => {
+        tab.classList.toggle('active', index === currentSlide);
+    });
+
+    if (currentSlide === slides.length - 1) {
+        playPauseButton.style.display = 'none';
+    } else {
+        playPauseButton.style.display = 'block';
+    }
+
+    clearTimeout(slideTimer);
+    if (isPlaying && currentSlide < slides.length - 1) {
+        slideTimer = setTimeout(nextSlide, slideDuration);
+    }
+}
+
+/**
+ * Advances to the next slide in the sequence.
+ */
+function nextSlide() {
+    if (currentSlide < slides.length - 1) {
+        currentSlide++;
+        updateSlide();
+    }
+}
+
+/**
+ * Returns to the previous slide in the sequence.
+ */
+function prevSlide() {
+    if (currentSlide > 0) {
+        currentSlide--;
+        updateSlide();
+    }
+}
+
+/**
+ * Navigates directly to a specific slide by its index.
+ *
+ * @param {number} index - The index of the slide to navigate to.
+ */
+function goToSlide(index) {
+    currentSlide = index;
+    updateSlide();
+}
+
+
+/**
+ * Saves the user's Spotify Wrapped using a POST request and provides feedback.
+ */
+function saveWrap() {
+    const form = document.getElementById('saveWrapForm');
+    const saveButton = document.getElementById('saveWrapButton');
+    const successMessage = document.getElementById('saveSuccess');
+
+    saveButton.disabled = true;
+    saveButton.textContent = 'Saving...';
+
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch(form.action, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json',
+        },
+        credentials: 'same-origin'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            successMessage.style.display = 'block';
+            saveButton.textContent = 'Saved! 🎉';
+            saveButton.style.backgroundColor = '#2E77D0';
+
+            setTimeout(() => {
+                window.location.href = data.redirect_url || '/profile/';
+            }, 2000);
+        } else {
+            throw new Error(data.error || 'Failed to save wrap');
+        }
+    })
+    .catch(error => {
+        console.error('Save error:', error);
+        saveButton.textContent = 'Try Again';
+        saveButton.style.backgroundColor = '#dc3545';
+        saveButton.disabled = false;
+
+        successMessage.textContent = 'Error saving wrap. Please try again.';
+        successMessage.style.display = 'block';
+        successMessage.style.backgroundColor = '#dc3545';
+        setTimeout(() => {
+            successMessage.style.display = 'none';
+            successMessage.textContent = 'Your Wrap has been saved! 🎵';
+            successMessage.style.backgroundColor = '#1DB954';
+        }, 3000);
+    });
+}
+
+/**
+ * Plays the user's top track on the current Spotify device.
+ */
+function playTopTrack() {
+    const subscriptionType = "{{ user_data.subscription_type }}"; // Make sure this value is passed to the template
+    if (subscriptionType === 'free') {
+        alert("Sorry, you can't play your top tracks because you don't have a Spotify Premium account.");
+        return; // Exit the function if the user doesn't have Premium
+    }
+    if (!deviceId) {
+        console.error("Device ID is not ready yet.");
+        return;
+    }
+    const trackUri = "{{ user_data.top_track.uri }}";
+    console.log("Track URI being sent:", trackUri);
+
+    // Make a fetch request to start playback on the player
+    fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            uris: ["{{ user_data.top_track.uri }}"]  // URI for the top track
+        })
+    }).then(response => {
+        if (response.ok) {
+            updateButtonVisibility(true);
+        } else {
+            console.error("Failed to start playback:", response);
+        }
+    }).catch(error => console.error(error));
+}
+
+/**
+ * Pauses the current track on Spotify.
+ */
+function pauseTrack() {
+    player.pause().then(() => {
+        updateButtonVisibility(false);  // Show play button
+    }).catch(error => console.error("Failed to pause playback:", error));
+}
+let randomStartMs = null;
+function playSnippet() {
+    const subscriptionType = "{{ user_data.subscription_type }}"; // Make sure this value is passed to the template
+    if (subscriptionType === 'free') {
+        alert("Sorry, you can't play this snippet because you don't have a Spotify Premium account.");
+        return; // Exit the function if the user doesn't have Premium
+    }
+    if (!deviceId) {
+        console.error("Device ID is not ready yet.");
+        return;
+    }
+    const trackDuration = "{{ user_data.guess_song_game.duration }}";
+    const trackUri = "{{ user_data.guess_song_game.uri }}";
+    if (randomStartMs === null) {
+        randomStartMs = Math.floor(Math.random() * (trackDuration - 1000));
+    } else {
+        console.log("Using previously set random start position:", randomStartMs, "ms");
+    }
+    console.log("Track URI being sent:", trackUri);
+
+    // Make a fetch request to start playback on the player
+    fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            uris: ["{{ user_data.guess_song_game.uri }}"]  // URI for the top track
+        })
+    }).then(response => {
+        if (response.ok) {
+            console.log("Playback started. Seeking to random position...");
+            // Seek to the random position
+            fetch(`https://api.spotify.com/v1/me/player/seek?position_ms=${randomStartMs}&device_id=${deviceId}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(seekResponse => {
+                if (seekResponse.ok) {
+                    console.log("Seek successful. Playing snippet...");
+                    // Pause playback after 1 second
+                    setTimeout(() => {
+                        fetch(`https://api.spotify.com/v1/me/player/pause?device_id=${deviceId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Authorization': `Bearer ${accessToken}`,
+                                'Content-Type': 'application/json',
+                            }
+                        }).then(pauseResponse => {
+                            if (!pauseResponse.ok) {
+                                console.error("Failed to pause playback:", pauseResponse);
+                            } else {
+                                console.log("Snippet playback paused.");
+                            }
+                        }).catch(error => console.error("Error pausing playback:", error));
+                    }, 1000); // Play for 1 second
+                } else {
+                    console.error("Failed to seek:", seekResponse);
+                }
+            }).catch(error => console.error("Error during seek:", error));
+        } else {
+            console.error("Failed to start playback:", response);
+        }
+    })
+    .catch(error => console.error("Error starting playback:", error));
+}
+
+
+/**
+ * Updates the visibility of the play and pause buttons based on the playback state.
+ *
+ * @param {boolean} isPlaying - Whether the track is currently playing.
+ */
+function updateButtonVisibility(isPlaying) {
+    const playButton = document.getElementById("playButton");
+    const pauseButton = document.getElementById("pauseButton");
+
+    if (isPlaying) {
+        playButton.style.display = "none";
+        pauseButton.style.display = "inline-block";
+    } else {
+        playButton.style.display = "inline-block";
+        pauseButton.style.display = "none";
+    }
+}
+
+/**
+ * Toggles the user's language preference in a cycle and updates it on the server.
+ * Supported languages cycle through English (en), Spanish (es), Bengali (bn), and Chinese (zh).
+ * After the update, the page reloads to apply the changes.
+ *
+ * @async
+ * @function toggleLanguage
+ * @throws Will log an error to the console if the network request fails or the server responds with an error.
+ */
+async function toggleLanguage() {
+    const currentLang = '{{ language|default:"en" }}';
+    const langCycle = {
+        'en': 'es',
+        'es': 'bn',
+        'bn': 'zh',
+        'zh': 'en'
+    };
+    const newLang = langCycle[currentLang] || 'en';
+
+    try {
+        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        // Update this URL to use the correct path
+        const response = await fetch("{% url 'users:update_language' %}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrfToken,
+                'Accept': 'application/json'
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ language: newLang })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            if (data.status === 'success') {
+                window.location.reload();
+            } else {
+                throw new Error(data.error || 'Language update failed');
+            }
+        } else {
+            throw new Error('Network response was not ok');
+        }
+    } catch (error) {
+        console.error('Error updating language:', error);
+    }
+}
+
+// Initialize
+updateSlide();
+/**
+ * Checks if the selected answer matches the correct artist.
+ * Updates the result message and its style color based on whether the answer is correct.
+ *
+ * @param {string} selected - The selected artist's name.
+ * @param {string} correct - The correct artist's name.
+ *
+ * Behavior:
+ * - If the selected artist matches the correct one:
+ *   - Displays "Correct! 🎉" in white text.
+ * - Otherwise:
+ *   - Displays "Incorrect! Try again." in red text.
+ *
+ * Dependencies:
+ * - An HTML element with the ID 'resultArtist' must exist to display the result message.
+ */
+function checkAnswerArtist(selected, correct) {
+    const resultArtist = document.getElementById('resultArtist');
+    if (selected === correct) {
+        resultArtist.textContent = "Correct! 🎉";
+        resultArtist.style.color = "white";
+    } else {
+        resultArtist.textContent = "Incorrect! Try again.";
+        resultArtist.style.color = "red";
+    }
+}
+
+/**
+ * Checks if the selected answer matches the correct one.
+ * Updates the result message and its style color based on whether the answer is correct.
+ *
+ * @param {string} selected - The selected answer.
+ * @param {string} correct - The correct answer.
+ *
+ * Behavior:
+ * - If the selected answer matches the correct one:
+ *   - Displays "Correct! 🎉" in white text.
+ * - Otherwise:
+ *   - Displays "Incorrect! Try again." in red text.
+ *
+ * Dependencies:
+ * - An HTML element with the ID 'result' must exist to display the result message.
+ */
+function checkAnswer(selected, correct) {
+    const result = document.getElementById('result');
+    if (selected === correct) {
+        result.textContent = "Correct! 🎉";
+        result.style.color = "white";
+    } else {
+        result.textContent = "Incorrect! Try again.";
+        result.style.color = "red";
+    }
+}
+   
+</script>

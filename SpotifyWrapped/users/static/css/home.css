@@ -1,0 +1,871 @@
+
+body {
+    background: linear-gradient(45deg, #450af5, #c4efd9);
+    min-height: -webkit-fill-available;
+    height: 100vh; /* Fallback */
+    width: 100%;
+    font-family: Arial, sans-serif;
+    color: white;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column; /* Stacks .container on top of .displaySection */
+    align-items: center;
+    text-align: center;
+    transition: background 0.5s ease, color 0.5s ease;
+    position: relative; /* Keeps corner images positioned correctly */
+     overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+
+h1 {
+    font-size: 50px;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 50vh; /* Restricts container height to the top half of the page */
+    width: 100%; /* Ensures it spans the full width */
+    box-sizing: border-box; /* Includes padding and borders in the height */
+}
+
+
+.theme-toggle {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: #a28ce3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 25px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+    z-index: 5; /* Ensure it appears above other elements */
+}
+.lang-toggle {
+    position: absolute;
+    top: 20px;
+
+    background-color: #a28ce3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 25px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    transition: background-color 0.3s ease;
+    z-index: 5;
+}
+.theme-toggle:hover {
+    background-color: #68549a;
+}
+.lang-toggle:hover {
+    background-color: #68549a;
+}
+.theme-toggle {
+    right: 20px;
+}
+
+.lang-toggle {
+    right: 200px; /* Position the language toggle button to the left of the theme toggle */
+}
+
+.spotify-logo {
+    width: 200px;
+    margin-top: 20px;
+}
+
+/* Dark mode styles */
+body.dark-mode {
+    background: linear-gradient(135deg, #03280a, #0c0c0c); /* Darker green and black */
+    color: #cccccc;
+}
+
+.dark-mode h1 {
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.2); /* Lighter shadow for dark mode */
+}
+
+.dark-mode .theme-toggle {
+     background-color: #001305;
+    color: white;
+}
+.dark-mode .lang-toggle {
+     background-color: #001305;
+    color: white;
+}
+.dark-mode .menu-toggle {
+    background-color: #001305;
+    color: white;
+}
+.dark-mode .theme-toggle:hover {
+    background-color: #17a249;
+}
+.dark-mode .lang-toggle:hover {
+    background-color: #17a249;
+}
+.dark-mode .menu-toggle:hover {
+    background-color: #17a249;
+}
+.dark-mode .button:hover {
+    background-color: #17a249; /* Darker shade on hover */
+}
+
+
+/* Halloween theme */
+body.halloween-mode {
+    background: radial-gradient(circle, #f0701b, #000000); /* Halloween orange and black */
+    color: #ffffff;
+}
+
+.halloween-mode h1 {
+    text-shadow: 2px 2px 4px rgba(255, 136, 0, 0.8);
+}
+
+.halloween-mode .theme-toggle {
+    background-color: #ff7518;
+}
+.halloween-mode .lang-toggle {
+    background-color: #ff7518;
+}
+.halloween-mode .menu-toggle {
+    background-color: #ff7518;
+}
+.halloween-mode .theme-toggle:hover {
+    background-color: #a14706;
+}
+ .halloween-mode .lang-toggle:hover {
+    background-color: #a14706;
+}
+  .halloween-mode .menu-toggle:hover {
+    background-color: #a14706;
+}
+  .halloween-mode .button:hover {
+    background-color: #a14706; /* Darker shade on hover */
+}
+
+/* Halloween corner images */
+.halloween-top-left-image {
+    position: absolute;
+    top: 10px; /* Adjust as needed */
+    left: 10px; /* Adjust as needed */
+    width: 300px; /* Size of Halloween corner image */
+    z-index: 3;
+    transform: scaleX(-1); /* Flips the image horizontally */
+}
+
+/* Full-size Halloween background overlay image */
+/*.halloween-background-overlay {*/
+/*    position: absolute;*/
+/*    top: 0;*/
+/*    left: 0;*/
+/*    width: 100vw;*/
+/*    height: 100vh;*/
+/*    object-fit: cover;*/
+/*    z-index: 0;*/
+/*    !*opacity: 0.5; !* Adjust opacity as needed *!*!*/
+/*}*/
+.halloween-background-overlay {
+position: absolute;
+top: 50%; /* Vertically center */
+left: 110%; /* Start off-screen on the right */
+transform: translateY(-50%); /* Adjust for perfect vertical centering */
+width: 400px; /* Adjust size as needed */
+height: auto;
+animation: moveHalloweenOverlay 6s linear infinite; /* Infinite animation */
+    z-index: 5;
+    pointer-events: none;
+}
+
+@keyframes moveHalloweenOverlay {
+0% {
+    left: 110%; /* Start off-screen on the right */
+}
+50% {
+    left: 50%; /* Move to the center of the screen */
+}
+100% {
+    left: -100%; /* Move off-screen to the left */
+}
+}
+
+
+/* Christmas theme */
+body.christmas-mode {
+    background: radial-gradient(circle, #ff0000, #390101);
+    color: white;
+}
+
+.christmas-mode h1 {
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.7);
+}
+
+.christmas-mode .theme-toggle {
+    background-color: #ff0000;
+}
+.christmas-mode .lang-toggle {
+    background-color: #ff0000;
+}
+.christmas-mode  .menu-toggle {
+    background-color: #ff0000;
+}
+.christmas-mode .theme-toggle:hover {
+    background-color: #17a249;
+}
+.christmas-mode .lang-toggle:hover {
+    background-color: #17a249;
+}
+.christmas-mode .menu-toggle:hover {
+    background-color: #17a249;
+}
+.christmas-mode .button:hover {
+    background-color: #17a249; /* Darker shade on hover */
+}
+.christmas-mode .nav-menu a:hover {
+    background-color:#17a249;
+}
+
+
+/* Small image in bottom right corner (Halloween) */
+.corner-image {
+    position: absolute;
+    bottom: 10px; /* Adjust as needed */
+    right: 10px; /* Adjust as needed */
+    width: 250px; /* Size for Halloween corner image */
+    z-index: 2;
+}
+
+/* Snow image styling */
+/*.snow-image {*/
+/*        position: absolute;*/
+/*        top: 20px;*/
+/*        right: 30px;*/
+/*        width: 1500px;*/
+/*        height: 540px;*/
+/*        z-index: 1;*/
+
+/*  }
+
+*/
+.snow-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 5;
+    }
+
+    .snowflake {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        background-color: white;
+        border-radius: 50%;
+        animation: fall .08s linear infinite;
+    }
+
+    @keyframes fall {
+        0% {
+            transform: translateY(-10px);
+            opacity: 0.9;
+        }
+        100% {
+            transform: translateY(100vh);
+            opacity: 0.2;
+        }
+    }
+
+
+/* Small image in bottom right corner (Christmas) */
+/* Christmas corner image with animation */
+.christmas-corner-image {
+    position: absolute;
+    bottom: 10px;
+    width: 500px;
+    z-index: 5;
+    animation: moveAcross 6s linear infinite;
+   pointer-events: none;
+}
+
+/* Keyframes for moving image across the screen */
+@keyframes moveAcross {
+    0% { transform: translateX(100vw); }
+    100% { transform: translateX(-100vw); }
+}
+
+.displaySection {
+    display: flex; /* Ensures contents are displayed side by side */
+    justify-content: space-around; /* Adds space between each item */
+    width: 66.67%; /* Makes the div take up two-thirds of the page */
+    padding: 20px; /* Adds padding for a cleaner look */
+    margin: auto; /* Centers the section */
+    border-radius: 10px; /* Optional: adds rounded corners */
+    color: black; /* Sets text color for better contrast on light background */
+}
+
+.tracks{
+    background-color: #333;
+    width: 22%;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #888;
+    font-size: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+
+}
+
+.artists{
+    background-color: #333;
+    width: 22%;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #888;
+    font-size: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+
+}
+
+.generes{
+    background-color: #333;
+    width: 22%;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #888;
+    font-size: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+
+}
+
+.profile{
+    background-color: #333;
+    width: 22%;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #888;
+    font-size: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+
+}
+
+.wrapped p {
+    margin: 0 0 10px 0;
+    font-size: 16px;
+    text-align: center;
+  }
+
+.button-container {
+    display: flex;
+    gap: 10px; /* Space between buttons */
+}
+
+.button {
+    display: inline-block;
+    padding: 15px 30px;
+    margin: 10px;
+    background-color: #4CAF50; /* Button color */
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px; /* Rounded corners */
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease; /* Smooth hover effect */
+}
+
+.button:hover {
+    background-color: #a28ce3; /* Darker shade on hover */
+}
+
+.tracks {
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 22%;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 5;
+}
+.artists {
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 22%;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 5;
+}
+.genres {
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 22%;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 5;
+}
+.profile {
+    background-color: rgba(0, 0, 0, 0.5);
+    width: 22%;
+    height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 5;
+}
+
+.menu-toggle {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: #a28ce3;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    border-radius: 25px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 5;
+}
+
+.menu-toggle:hover {
+    background-color: #68549a;
+}
+
+/* Slide-in navigation menu */
+.nav-menu {
+    position: fixed;
+    top: 0;
+    left: -250px; /* Hidden off-screen */
+    width: 250px;
+    height: 100%;
+    background-color: #333;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    padding-top: 60px; /* Padding for spacing from the top */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+    transition: left 0.3s ease; /* Smooth slide-in effect */
+    z-index: 5;
+}
+
+/* Active class to slide the menu in */
+.nav-menu.active {
+    left: 0;
+}
+
+.nav-menu a {
+    color: #ffffff;
+    font-size: 1.5em;
+    margin: 15px 20px;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.nav-menu a:hover {
+    color: #a7a7ae;
+}
+
+/* Close button inside the menu */
+.close-menu {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 1.5em;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.close-menu:hover {
+    color: #a7a7ae;
+}
+
+
+/* Animated background elements */
+.background-shapes {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.shape {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    animation: floatShape 20s infinite linear;
+}
+
+@keyframes floatShape {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+    100% {
+        transform: translate(var(--moveX), var(--moveY)) rotate(360deg);
+    }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.5rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .display-section {
+        grid-template-columns: 1fr;
+    }
+}
+#green-bubble-container {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+pointer-events: none;
+overflow: hidden;
+z-index: 5;
+}
+
+.bubble {
+position: absolute;
+background-color: rgba(10, 184, 18, 0.57); /* Transparent green */
+border-radius: 50%;
+animation: floatUp 6s linear infinite;
+}
+
+@keyframes floatUp {
+0% {
+    transform: translateY(100vh) scale(0.5);
+    opacity: 0.8;
+}
+50% {
+    opacity: 1;
+}
+100% {
+    transform: translateY(-10vh) scale(1.2);
+    opacity: 0;
+}
+}
+
+
+@media (max-width: 768px) {
+    /* Container adjustments */
+    .container {
+        height: auto;
+        padding: 20px;
+        width: 100%;
+    }
+
+    /* Header adjustments */
+    h1 {
+        font-size: 32px;
+        padding: 0 15px;
+    }
+
+    /* Display section modifications */
+    .displaySection {
+        flex-direction: column;
+        width: 90%;
+        padding: 10px;
+    }
+
+    /* Adjust all stat boxes to full width */
+    .tracks,
+    .artists,
+    .genres,
+    .profile {
+        width: 90%;
+        margin: 10px auto;
+        height: 250px;
+    }
+
+    /* Button adjustments */
+    .button-container {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .button {
+        width: 80%;
+        padding: 12px 20px;
+        margin: 5px 0;
+    }
+
+    /* Navigation adjustments */
+    .nav-menu {
+        width: 100%;
+        left: -100%;
+    }
+
+    .nav-menu.active {
+        width: 100%;
+    }
+
+    .nav-menu a {
+        font-size: 1.2em;
+        padding: 15px;
+        margin: 5px 15px;
+    }
+
+    /* Toggle button positioning */
+    .theme-toggle,
+    .lang-toggle {
+        padding: 8px 15px;
+        font-size: 0.9em;
+    }
+
+    .lang-toggle {
+        right: 120px;
+    }
+
+    /* Adjust corner images for mobile */
+    .halloween-top-left-image,
+    .christmas-corner-image {
+        width: 150px;
+    }
+
+    .corner-image {
+        width: 120px;
+    }
+
+    /* Animation adjustments */
+    .halloween-background-overlay {
+        width: 200px;
+    }
+
+    @keyframes moveHalloweenOverlay {
+        0% {
+            left: 110%;
+        }
+        50% {
+            left: 40%;
+        }
+        100% {
+            left: -50%;
+        }
+    }
+
+    /* Background shapes adjustment */
+    .shape {
+        transform-origin: center;
+        scale: 0.7;
+    }
+}
+
+/* Additional breakpoint for very small devices */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 24px;
+    }
+
+    .theme-toggle,
+    .lang-toggle,
+    .menu-toggle {
+        padding: 6px 12px;
+        font-size: 0.8em;
+    }
+
+    .lang-toggle {
+        right: 100px;
+    }
+
+    /* Further reduce image sizes */
+    .halloween-top-left-image,
+    .christmas-corner-image {
+        width: 100px;
+    }
+
+    .corner-image {
+        width: 80px;
+    }
+
+    /* Adjust snow animation */
+    .snowflake {
+        width: 6px;
+        height: 6px;
+    }
+
+    /* Adjust green bubbles */
+    .bubble {
+        transform: scale(0.7);
+    }
+
+    /* Ensure no horizontal overflow */
+    body {
+        overflow-x: hidden;
+        width: 100%;
+    }
+}
+
+/* Ensure proper orientation handling */
+@media (orientation: landscape) and (max-height: 500px) {
+    .container {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .displaySection {
+        flex-wrap: wrap;
+        height: auto;
+    }
+}
+
+/* Fix for iOS Safari 100vh issue */
+@supports (-webkit-touch-callout: none) {
+    .container {
+        height: -webkit-fill-available;
+    }
+}
+
+@supports (-webkit-touch-callout: none) {
+    body {
+        min-height: -webkit-fill-available;
+    }
+    
+    .container,
+    .displaySection,
+    .nav-menu,
+    .background-shapes,
+    .snow-container,
+    #green-bubble-container {
+        min-height: -webkit-fill-available;
+    }
+    
+    /* Fix for iOS gradient issues */
+    body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+    }
+    
+    body.dark-mode::before {
+        background: linear-gradient(135deg, #03280a, #0c0c0c) fixed;
+    }
+    
+    body.halloween-mode::before {
+        background: radial-gradient(circle at center, #f0701b, #000000) fixed;
+    }
+    
+    body.christmas-mode::before {
+        background: radial-gradient(circle at center, #ff0000, #390101) fixed;
+    }
+    
+    /* Fix for iOS animation performance */
+    .halloween-background-overlay,
+    .christmas-corner-image,
+    .snowflake,
+    .bubble,
+    .shape {
+        -webkit-transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        -webkit-perspective: 1000;
+    }
+}
+
+/* Fix for iOS safe areas */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: max(0px, env(safe-area-inset-left));
+        padding-right: max(0px, env(safe-area-inset-right));
+        padding-top: max(0px, env(safe-area-inset-top));
+        padding-bottom: max(0px, env(safe-area-inset-bottom));
+    }
+}
+
+@media screen and (max-width: 768px) {
+    html {
+        font-size: 14px;
+    }
+    
+    h1 {
+        font-size: 1.8em;
+    }
+    
+    h2 {
+        font-size: 1.3em;
+    }
+    
+    .track-name {
+        font-size: 0.9em;
+    }
+    
+    .artist-name {
+        font-size: 0.8em;
+    }
+}
+
+@media (hover: none) {
+    /* Increase touch targets */
+    .arrow {
+        padding: 20px;
+    }
+    
+    .tab {
+        min-height: 30px;
+        min-width: 30px;
+    }
+    
+    /* Increase button spacing */
+    .guess-button,
+    #playTopTrack,
+    #pauseTrack,
+    .save-wrap-button {
+        margin: 15px auto;
+        min-height: 44px; /* Standard minimum touch target size */
+    }
+}
